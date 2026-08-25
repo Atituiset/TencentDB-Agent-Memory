@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>生成管线与召回机制 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/advanced/pipeline-recall.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="生成管线与召回机制"><a class="header" href="#生成管线与召回机制">生成管线与召回机制</a></h1>
+<p>记忆系统有两个引擎：一个负责"长出来"（生成管线），一个负责"找回来"（召回）。本章深入两者的实现。</p>
+<h2 id="生成管线从-l0-到-l3"><a class="header" href="#生成管线从-l0-到-l3">生成管线：从 L0 到 L3</a></h2>
+<h3 id="调度结构"><a class="header" href="#调度结构">调度结构</a></h3>
+<pre><code class="language-text">L0 写入 ──► Timer Scanner ──► 任务队列 ──► Worker Permit Pool ──► Pipeline Worker
+   (services/timer-scanner.ts)              (worker-permit-pool.ts)   (pipeline-worker.ts)
+</code></pre>
+<ul>
+<li><strong>Scanner</strong> 周期扫描各会话的未处理轮数，判断是否达到触发条件；</li>
+<li><strong>队列</strong>在 standalone 模式是进程内 Map（checkpoint 到文件防重启丢失），service 模式是 Redis Stream；</li>
+<li><strong>Permit Pool</strong> 控制并发度，service 模式下配合分布式锁保证同一会话的任务不被多节点重复消费。</li>
+</ul>
+<h3 id="触发条件与预热"><a class="header" href="#触发条件与预热">触发条件与预热</a></h3>
+<p>触发由两个条件任一满足：</p>
+<ol>
+<li>会话新增轮数 ≥ 阈值。稳态阈值即 <code>pipeline.everyNConversations</code>（默认 5）；</li>
+<li>会话空闲超过 <code>l1IdleTimeoutSeconds</code>——避免"差一轮永远不跑"的尴尬。</li>
+</ol>
+<p>预热机制（<code>pipeline-manager.ts</code> 的 warm-up 逻辑）值得单独一提：新会话的阈值不是直接从 5 开始，而是 <strong>1 → 2 → 4 → 8 → … → N</strong> 翻倍爬升。效果是新用户的第 1 轮对话结束后就能看到第一条 L1 记忆，而不是对着空面板怀疑人生；随着交互加深，触发频率逐渐放缓到稳态，避免碎片化提炼。</p>
+<h3 id="各层的提炼实现"><a class="header" href="#各层的提炼实现">各层的提炼实现</a></h3>
+<p>每层有专属的 Prompt 模板与后处理（<code>src/core/prompts/</code>）：</p>
+<ul>
+<li><strong>L1 抽取</strong>（<code>l1-extraction.ts</code> + <code>l1-dedup.ts</code>）：LLM 从对话片段提取原子条目（事实/偏好/约束/事件），输出 JSON 协议；随后与既有 L1 做去重合并——语义等价的旧条目被更新而非重复创建。</li>
+<li><strong>L2 场景</strong>（<code>scene-extraction.ts</code>）：把相关 L1 归纳为 Scene Markdown 块，写入 <code>profiles/{scope}/scene_blocks/*.md</code>，数据库登记元数据（TCVDB 路径下 ID 为 <code>profile:v1:{sha256}</code>）。</li>
+<li><strong>L3 画像</strong>（<code>persona-generation.ts</code>）：跨场景沉淀稳定模式为 Persona 文档 <code>persona.md</code>。</li>
+</ul>
+<p>固定输出协议（L1 的 JSON 结构、L2/L3 的 Markdown 格式）不可被自定义 Prompt 篡改——自定义只能调整"关注什么"，不能改变"输出成什么样"。这是下游消费方（注入器、面板渲染）赖以工作的契约。</p>
+<p>每次生成的完整溯源（Prompt ID、版本、内容哈希、输入输出引用）写入 Generation Log，见<a href="./custom-prompt-lineage.html">专章</a>。</p>
+<h2 id="召回机制少拿但拿对"><a class="header" href="#召回机制少拿但拿对">召回机制：少拿但拿对</a></h2>
+<h3 id="混合检索的三种模式"><a class="header" href="#混合检索的三种模式">混合检索的三种模式</a></h3>
+<p>召回入口在 <code>src/core/hooks/auto-recall.ts</code> 与 <code>src/core/tools/memory-search.ts</code> / <code>conversation-search.ts</code>：</p>
+<ul>
+<li><strong>keyword</strong>：FTS5 BM25 全文检索；</li>
+<li><strong>embedding</strong>：向量相似度；</li>
+<li><strong>hybrid</strong>（默认）：双路并行检索，结果用 <strong>RRF（Reciprocal Rank Fusion）</strong> 融合。</li>
+</ul>
+<p>RRF 的实现非常克制（<code>RRF_K = 60</code>，取自原始论文的标准常数）：</p>
+<pre><code class="language-text">score(item) = Σ 1 / (k + rank_i + 1)
+</code></pre>
+<p>某条记录同时出现在关键词榜和向量榜时，两边的 RRF 分数累加——天然奖励"两种信号都认为相关"的结果。SQLite 路径下融合在客户端完成（先超额检索再合并）；TCVDB 路径则直接用服务端原生 hybridSearch 短路返回。</p>
+<h3 id="召回质量的护栏"><a class="header" href="#召回质量的护栏">召回质量的护栏</a></h3>
+<p>原始相似度之外还有多层过滤：</p>
+<ul>
+<li><strong>分数阈值</strong>：<code>recall.scoreThreshold</code>（默认 0.3）以下的结果丢弃；</li>
+<li><strong>条数上限</strong>：限制返回条目数；</li>
+<li><strong>字符预算</strong>：格式化后的总长度受限，防止记忆占满上下文；</li>
+<li><strong>超时</strong>：召回整体有超时控制，慢查询宁可返回空也不阻塞主链路。</li>
+</ul>
+<p>错误也是分级的：Embedding 未配置这类情况以结构化 <code>RecallError</code>（code 20001 等）返回，调用方可感知地降级，而不是抛异常。</p>
+<h3 id="缓存友好的上下文拆分"><a class="header" href="#缓存友好的上下文拆分">缓存友好的上下文拆分</a></h3>
+<p>auto-recall 里有一处明确注释的性能设计（H-15 系列），值得所有做 LLM 应用的人学习。召回结果被拆进两个通道：</p>
+<ul>
+<li><strong><code>appendSystemContext</code></strong>：persona、场景导航、工具使用指南——这些内容<strong>跨轮稳定</strong>，追加到 system prompt 尾部，可以命中上游 provider 的 prompt cache；</li>
+<li><strong><code>prependContext</code></strong>：本轮查询命中的 L1 相关记忆——<strong>每轮变化</strong>，前置到 user prompt，不污染缓存前缀。</li>
+</ul>
+<p>顺序很重要：稳定的在前、易变的在后（对 system prompt 而言），才能让缓存前缀尽量长。Proxy 的注入管线遵循同一哲学（见 <a href="./proxy-internals.html">Proxy 内幕</a>）。</p>
+<h2 id="skill-子系统速写"><a class="header" href="#skill-子系统速写">Skill 子系统速写</a></h2>
+<p>Skill 是数据面里最复杂的业务对象，几个要点：</p>
+<ul>
+<li><strong>存储</strong>：SQLite 路径用 vectors.db 的 <code>skills / skill_fts / skill_vec</code> 三表（BM25 + 向量）；资源文件按 <code>&lt;skill_id&gt;/v&lt;version&gt;/files/</code> 组织；TCVDB 路径用 <code>{db}_skills</code> 集合；</li>
+<li><strong>版本化</strong>：<code>skill-versioning.ts</code> 维护版本链，更新走 <code>expected_version</code> 乐观锁；</li>
+<li><strong>抽取</strong>：对话经 <code>/v3/skill/conversation/add</code> 进入缓冲区（COS 上按 <code>{space}/{user}/{team}/{agent}/{session}/</code> 组织），后台判定是否值得归档；另有 fast-path 处理显式触发的 <code>mem:create-skill</code>；</li>
+<li><strong>降级</strong>：向量路不可用时检索自动回退 BM25 并记录 <code>SkillDegradation</code> 事件，契约层面保证 mode 不被静默吞掉；</li>
+<li><strong>隔离</strong>：CI 对这个模块有一条硬性红线——禁止引入直接 fs import、禁止触碰 pipeline-worker/integrations/redis（见<a href="./upgrade-migration.html">升级与迁移</a>章的 CI 一节）。</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../advanced/memorycore-internals.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../advanced/custom-prompt-lineage.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../advanced/memorycore-internals.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../advanced/custom-prompt-lineage.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

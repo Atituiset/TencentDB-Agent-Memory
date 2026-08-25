@@ -1,0 +1,296 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>环境变量速查 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/appendix/env-vars.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="环境变量速查"><a class="header" href="#环境变量速查">环境变量速查</a></h1>
+<p>按组件归类的常用环境变量。完整清单以各组件 <code>.env.example</code> 与配置模板为准。</p>
+<h2 id="memorycoregateway"><a class="header" href="#memorycoregateway">MemoryCore（Gateway）</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>默认值</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>TDAI_GATEWAY_CONFIG</code></td><td>自动发现</td><td>配置文件路径</td></tr>
+<tr><td><code>TDAI_GATEWAY_HOST</code></td><td><code>127.0.0.1</code></td><td>监听地址</td></tr>
+<tr><td><code>TDAI_GATEWAY_PORT</code></td><td><code>8420</code></td><td>监听端口</td></tr>
+<tr><td><code>TDAI_GATEWAY_API_KEY</code></td><td>未设置</td><td>Bearer 鉴权；<strong>非回环监听必须设置</strong></td></tr>
+<tr><td><code>TDAI_CORS_ORIGINS</code></td><td>空</td><td>允许的 Origin，逗号分隔</td></tr>
+<tr><td><code>TDAI_DATA_DIR</code></td><td><code>~/.memory-tencentdb/memory-tdai</code></td><td>本地数据目录</td></tr>
+<tr><td><code>TDAI_LLM_API_KEY</code></td><td>空</td><td>LLM API Key</td></tr>
+<tr><td><code>TDAI_LLM_BASE_URL</code></td><td><code>https://api.openai.com/v1</code></td><td>OpenAI-compatible API 地址</td></tr>
+<tr><td><code>TDAI_LLM_MODEL</code></td><td><code>gpt-4o</code></td><td>模型名</td></tr>
+<tr><td><code>TDAI_SKILL_ENABLED</code></td><td>配置文件值</td><td>强制启用 Skill 模块</td></tr>
+</tbody></table>
+</div>
+<p>配置加载优先级：<code>TDAI_GATEWAY_CONFIG</code> → 当前目录 → 数据目录 → 环境变量 → 内置默认。</p>
+<h2 id="memoryproxy"><a class="header" href="#memoryproxy">MemoryProxy</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>TDAI_MEMORY_SYSTEM_USER_ID</code></td><td>memory 内部服务账号 user_id</td></tr>
+<tr><td><code>TDAI_MEMORY_SYSTEM_USER_KEY</code></td><td>内部服务账号 apiKey</td></tr>
+<tr><td><code>TDAI_PROXY_ADMIN_API_KEY</code></td><td>运维端点 shared secret</td></tr>
+<tr><td><code>PROXY_DB_PATH</code></td><td>sqlite 后端 db 路径兜底</td></tr>
+<tr><td><code>PROXY_FULL_STACK</code></td><td><code>1</code> 一键打开 auth + sessionInit + tdai 全流水线</td></tr>
+<tr><td><code>PROXY_ENABLE_AUTH</code> / <code>PROXY_ENABLE_SESSION_INIT</code> / <code>PROXY_ENABLE_TDAI</code></td><td>三大开关，可单独控制</td></tr>
+<tr><td><code>PROXY_CONFIG_DIR</code></td><td>指向自维护 config.yaml 目录（绕开 start-proxy.sh 覆写）</td></tr>
+</tbody></table>
+</div>
+<p>主要配置在 <code>config.yaml</code>（CLI 参数 &gt; YAML &gt; 内置默认），关键段：<code>upstream</code> / <code>auth</code> / <code>tdai</code> / <code>skill</code> / <code>knowledge</code> / <code>injection</code> / <code>extraction</code> / <code>sessionInit</code> / <code>storage</code> / <code>redis</code> / <code>rateLimit</code> / <code>clickhouse</code> / <code>creditReport</code>。</p>
+<h2 id="memoryknowledge"><a class="header" href="#memoryknowledge">MemoryKnowledge</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>PORT</code></td><td>默认 8421（开发）/ 8424（合并镜像）</td></tr>
+<tr><td><code>API_PREFIX</code></td><td>固定 <code>/v3</code></td></tr>
+<tr><td><code>KNOWLEDGE_DATA_DIR</code> / <code>KNOWLEDGE_DB_PATH</code></td><td>数据目录与 SQLite 路径</td></tr>
+<tr><td><code>KNOWLEDGE_PUBLIC_BASE_URL</code></td><td>写入资源 service_url；<strong>必须含 <code>/v3</code> 且 Agent 可达</strong></td></tr>
+<tr><td><code>TMC_CALLBACK_URL</code></td><td>Panel 根地址（不带 callback path）</td></tr>
+<tr><td><code>LLM_MODE</code></td><td><code>proxy</code>（默认，用 Panel 推送的 binding）/ <code>custom</code>（本地直连）</td></tr>
+<tr><td><code>LLM_API_KEY</code> / <code>LLM_BASE_URL</code> / <code>LLM_MODEL</code> / <code>LLM_PROTOCOL</code></td><td>custom 模式的直连参数</td></tr>
+<tr><td><code>KNOWLEDGE_AUTO_SYNC_ENABLED</code></td><td>Auto-Sync 总开关（默认关）</td></tr>
+<tr><td><code>KNOWLEDGE_AUTO_SYNC_SCAN_INTERVAL_MIN</code></td><td>扫描周期分钟数（默认 10，clamp 1–60）</td></tr>
+<tr><td><code>KNOWLEDGE_AUTO_SYNC_MAX_CONCURRENT</code></td><td>worker 数（默认 3，clamp 1–20）</td></tr>
+<tr><td><code>KNOWLEDGE_CLICKHOUSE_*</code></td><td>ClickHouse 工具调用埋点（URL/DATABASE/TABLE/USER/PASSWORD…）</td></tr>
+<tr><td><code>LANGFUSE_PUBLIC_KEY</code> / <code>LANGFUSE_SECRET_KEY</code></td><td>Wiki LLM 调用 trace</td></tr>
+</tbody></table>
+</div>
+<h2 id="memory-hub--panel"><a class="header" href="#memory-hub--panel">Memory Hub / Panel</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>REMOTE_INSTANCE_ID</code> / <code>REMOTE_INSTANCE_URL</code> / <code>REMOTE_INSTANCE_KEY</code></td><td>单实例快捷注册（容器网内别名如 <code>http://memory-core:8420</code>）</td></tr>
+<tr><td><code>REMOTE_INSTANCE_PROXY_URL</code></td><td>UI 客户端接入地址卡片展示用</td></tr>
+<tr><td><code>KNOWLEDGE_SERVICE_URL</code></td><td>Panel → KS 管理地址（不带 <code>/v3</code>）</td></tr>
+<tr><td><code>KNOWLEDGE_LLM_BINDING_SYNC</code></td><td>启动时是否推送 llm_binding</td></tr>
+<tr><td><code>METADATA_INSTANCES_CONFIG</code></td><td>实例注册表路径</td></tr>
+</tbody></table>
+</div>
+<h2 id="部署脚本deployglobal-imagesenv"><a class="header" href="#部署脚本deployglobal-imagesenv">部署脚本（deploy/global-images/.env）</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量组</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>MEMORY_LLM_BASE_URL / _API_KEY / _MODEL</code></td><td>Core + Hub 内部提炼/生成用 LLM</td></tr>
+<tr><td><code>PROXY_UPSTREAM_URL / _API_KEY / _MODEL</code></td><td>Proxy 转发的上游模型</td></tr>
+<tr><td><code>PULL=1</code></td><td>启动前拉取最新镜像</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../advanced/upgrade-migration.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../appendix/glossary.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../advanced/upgrade-migration.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../appendix/glossary.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

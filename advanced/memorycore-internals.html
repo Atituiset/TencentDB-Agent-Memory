@@ -1,0 +1,294 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>MemoryCore 内幕：存储与网关 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/advanced/memorycore-internals.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="memorycore-内幕存储与网关"><a class="header" href="#memorycore-内幕存储与网关">MemoryCore 内幕：存储与网关</a></h1>
+<p>MemoryCore 是全系统的数据权威。本章从存储抽象讲到 Gateway 鉴权，覆盖阅读其源码所需的全部背景。</p>
+<h2 id="存储抽象一套接口两种后端"><a class="header" href="#存储抽象一套接口两种后端">存储抽象：一套接口，两种后端</a></h2>
+<p><code>src/core/store/</code> 下有一层存储工厂（<code>factory.ts</code>），按配置把记忆读写路由到不同实现：</p>
+<ul>
+<li><strong>SQLite 路径</strong>（默认，standalone）：单文件数据库。元数据与记录在常规表中；检索靠 <strong>FTS5</strong>（全文，配合 jieba 中文分词；jieba 缺失时退化为正则切词）+ <strong>sqlite-vec</strong>（向量余弦相似度）。sqlite-vec 加载失败时整个向量路降级为 no-op，只剩关键词召回。</li>
+<li><strong>TCVDB 路径</strong>（腾讯云向量数据库）：面向规模化部署。集合命名带实例前缀（如 <code>{db}_profiles</code>、<code>{db}_skills</code>）；最大优势是<strong>服务端原生混合检索</strong>——dense + sparse + RRFRerank 在一次 API 调用内完成（<code>tcvdb.ts:1027</code> 附近可见 <code>rerank: { method: "rrf", k: 60 }</code>），省去客户端融合。</li>
+</ul>
+<p>Embedding 是可选项：未配置 OpenAI-compatible Embedding API 时，系统纯 BM25 运行；配置后自动启用双路。</p>
+<p>管理面的元数据存储同样有双后端：SQLite 的 <code>meta_users / _user_keys / _teams / _team_members / _agents / _tasks / _task_agents / _participation_logs / _assets / _agent_fixed_assets / _asset_acl / _config_params</code> 系列表，或 MongoDB（<code>store/sqlite-adapter.ts</code> vs <code>mongodb-adapter.ts</code>，按 <code>{prefix}_{instance_id}</code> 隔离）。</p>
+<p>大对象（L2/L3 Markdown 产物、Skill 资源文件、生成日志）走文件系统或 COS offload，数据库里只登记元数据行。</p>
+<h2 id="三层鉴权"><a class="header" href="#三层鉴权">三层鉴权</a></h2>
+<p>Gateway（<code>src/gateway/server.ts</code>，Node 原生 http 服务，:8420）的请求要过三道身份检查，各自回答不同的问题：</p>
+<pre><code class="language-text">Authorization: Bearer &lt;apiKey&gt;        ← 第一层：调用方是否被允许访问这个 Gateway
+x-tdai-service-id: &lt;instance&gt;         ← 第二层：操作哪个 Memory 实例（数据隔离）
+x-tdai-user-key: &lt;sk-mem-...&gt;         ← 第三层（管理面）：代表哪个用户行事
+</code></pre>
+<p>第一层的 Bearer Key 由 <code>TDAI_GATEWAY_API_KEY</code> 配置；本地回环监听且未设置时可省略。第二层是强制的——所有业务请求都必须声明实例。第三层用于 <code>/v3/meta/*</code> 管理面，Gateway 会校验 user_key 并以解析出的用户身份做 owner/ACL 权威判定。</p>
+<h2 id="v2-与-v3两代-api-的关系"><a class="header" href="#v2-与-v3两代-api-的关系">v2 与 v3：两代 API 的关系</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>前缀</th><th>定位</th></tr></thead><tbody>
+<tr><td><code>/capture</code> <code>/recall</code> <code>/search/*</code></td><td>早期兼容接口，保留</td></tr>
+<tr><td>`/v2/conversation</td><td>atomic</td></tr>
+<tr><td>`/v3/conversation</td><td>atomic</td></tr>
+<tr><td><code>/v3/skill/*</code></td><td>Skill 管理/检索/版本/抽取</td></tr>
+<tr><td><code>/v3/meta/*</code></td><td>User/Team/Agent/Task/Asset/ACL 管理面</td></tr>
+<tr><td><code>/v3/knowledge/*</code></td><td>知识资产元数据登记</td></tr>
+<tr><td><code>/v3/memory-prompt/*</code>、<code>/v3/memory-generation-log/*</code></td><td>自定义 Prompt 与溯源</td></tr>
+</tbody></table>
+</div>
+<p>v3 的核心变化是把隔离从"可选习惯"升级为"协议强制"：L0/L1 写入必须带 <code>team_id + agent_id + user_id + session_id</code> 四元组（缺 session 报 422），L2/L3 至少三元组；参数可放请求体或对应的 <code>x-tdai-*</code> Header。SDK 层面同样体现为构造函数强制三元组（见 <a href="./sdk-guide.html">SDK 章</a>）。</p>
+<p>路由组织上，v2 在 <code>gateway/v2-router.ts</code>，v3 分散在各业务 handler（<code>chat-memory-handlers.ts</code>、<code>skill-handlers.ts</code> 等）+ <code>metadata/router/v3-meta-router.ts</code>。</p>
+<h2 id="双部署形态standalone-与-service"><a class="header" href="#双部署形态standalone-与-service">双部署形态：standalone 与 service</a></h2>
+<p>这是理解 MemoryCore 源码最重要的分叉。<code>deployMode</code> 决定一切有状态的东西放在哪：</p>
+<div class="table-wrapper"><table><thead><tr><th>维度</th><th>standalone</th><th>service</th></tr></thead><tbody>
+<tr><td>任务队列</td><td>进程内 Map + checkpoint 文件</td><td>Redis Stream</td></tr>
+<tr><td>定时器</td><td><code>setTimeout</code> / <code>setInterval</code></td><td>16 分片的 Timer ZSET（Lua 认领任务）</td></tr>
+<tr><td>并发控制</td><td>进程内信号量</td><td>分布式锁 <code>pipeline:{inst:tid:aid}[:s:sess]</code></td></tr>
+<tr><td>存储</td><td>本地 SQLite + 本地目录/COS</td><td>per-instance VDB/COS/MetadataService（按 <code>x-tdai-service-id</code> 动态解析）</td></tr>
+</tbody></table>
+</div>
+<p>关键代码：<code>utils/pipeline-manager.ts</code>（standalone）vs <code>utils/stateful-pipeline-manager.ts</code>（service），由 <code>pipeline-factory.ts</code> 组装。<strong>两态共享同一套 handler 和 executor</strong>——业务逻辑只写一遍，差异全部收敛在状态管理层。这就是为什么单机体验和生产扩展可以共用同一份代码。</p>
+<h2 id="幂等与可追溯的实现纪律"><a class="header" href="#幂等与可追溯的实现纪律">幂等与可追溯的实现纪律</a></h2>
+<p>翻源码时会反复遇到这几条纪律：</p>
+<ul>
+<li><strong>upsert 写入</strong>：所有记录按 <code>record_id</code> 幂等写入，重复提交不产生脏数据；</li>
+<li><strong>乐观锁</strong>：Skill 更新携带 <code>expected_version</code>，并发修改冲突直接报错而不是静默覆盖；</li>
+<li><strong>只追加审计</strong>：对记忆的修改写 <code>memory_audit</code> 表，不覆盖历史；</li>
+<li><strong>JSONL append 带 ETag/位置校验</strong>：对象存储上的追加写会先验证当前内容指纹。</li>
+</ul>
+<p>这些纪律共同保证了一个性质：任何一条记忆的当前状态，都可以沿着 Generation Log 与 Audit 记录还原出完整的来龙去脉。</p>
+<h2 id="配置系统"><a class="header" href="#配置系统">配置系统</a></h2>
+<p>Gateway 配置按优先级加载：<code>TDAI_GATEWAY_CONFIG</code> 指定的 YAML/JSON → 当前目录 → 数据目录 → 环境变量 → 内置默认值。YAML 支持 <code>${VAR}</code> 形式引用环境变量。常用模板三份：</p>
+<ul>
+<li><code>tdai-gateway.standalone.yaml</code>：最小单机 Memory 配置；</li>
+<li><code>tdai-gateway.yaml</code>：Standalone + Skill 默认配置；</li>
+<li><code>tdai-gateway.proxy.yaml</code>：经 OpenAI-compatible Proxy 调用模型。</li>
+</ul>
+<p>关键配置段（<code>src/config.ts</code>）：<code>pipeline.everyNConversations</code>（默认 5）、<code>recall.scoreThreshold</code>（默认 0.3）、<code>llm.*</code>（模型三件套）、<code>skill.*</code>（Skill 模块开关）。完整环境变量清单见附录<a href="../appendix/env-vars.html">环境变量速查</a>。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../advanced/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../advanced/pipeline-recall.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../advanced/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../advanced/pipeline-recall.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>一键部署三件套 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/getting-started/quickstart.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="一键部署三件套"><a class="header" href="#一键部署三件套">一键部署三件套</a></h1>
+<h2 id="拉起服务"><a class="header" href="#拉起服务">拉起服务</a></h2>
+<p>整个过程四条命令：</p>
+<pre><code class="language-bash"># 1) 拿脚本
+git clone https://github.com/TencentCloud/TencentDB-Agent-Memory.git
+cd TencentDB-Agent-Memory/deploy/global-images
+
+# 2) 准备 .env（把 LLM 相关字段填成真值）
+cp .env.example .env
+$EDITOR .env
+
+# 3) 干跑校验（可选；会真做 LLM 通路预检，加 --skip-llm 跳过）
+./verify.sh
+
+# 4) 一键起
+./start-all.sh
+</code></pre>
+<p><code>.env</code> 里最关键的是两组 LLM 参数：</p>
+<pre><code class="language-dotenv">MEMORY_LLM_BASE_URL=...      # memory + hub 内部提炼用
+MEMORY_LLM_API_KEY=...
+MEMORY_LLM_MODEL=...
+
+PROXY_UPSTREAM_URL=...       # proxy 转发到的上游（你实际对话的模型）
+PROXY_UPSTREAM_API_KEY=...
+PROXY_UPSTREAM_MODEL=...
+</code></pre>
+<h2 id="脚本背后发生了什么"><a class="header" href="#脚本背后发生了什么">脚本背后发生了什么</a></h2>
+<p>理解脚本的编排逻辑，出问题时才知道去哪看。<code>start-all.sh</code> 在 <code>tdai-memory-stack</code> 这个 Docker 网络上按依赖顺序拉起三个容器，每一步都等待健康检查通过再继续：</p>
+<p><strong>Memory Core 容器</strong>：脚本动态生成一份 standalone 模式的 Gateway 配置（开启 Skill、pipeline 每 5 轮触发、召回阈值 0.3），挂载到容器内并挂一个 named volume 做数据持久化。接着是 <strong>init-admin 流程</strong>——用 openssl 生成 <code>sk-mem-&lt;32位随机&gt;</code> 作为管理员密钥，调用 <code>/v3/internal/meta/user/init-admin</code> 注册 admin 用户；密钥以严格文件权限落盘为 <code>./.admin-key</code>，重复执行会复用已有文件。</p>
+<p><strong>Memory Hub 容器</strong>：合并镜像同时跑 Panel 与 Knowledge Service。它通过容器网络别名 <code>http://memory-core:8420</code> 连接 Core，脚本还会探测宿主机局域网 IP 以生成正确的对外访问地址。</p>
+<p><strong>Proxy 容器</strong>：同样由脚本从 <code>.env</code> 生成最小 config.yaml，打开三大开关——鉴权（auth）、会话初始化（sessionInit）、记忆接入（tdai）——即 <code>PROXY_FULL_STACK=1</code> 的完整流水线。</p>
+<p>全部就绪后，脚本打印服务地址表和一段可直接复制运行的 Claude Code 启动命令。</p>
+<h2 id="端口速查"><a class="header" href="#端口速查">端口速查</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>服务</th><th>端口</th><th>用途</th></tr></thead><tbody>
+<tr><td>Memory Core</td><td><code>8420</code></td><td>记忆读写、鉴权、skill/RAG 数据面</td></tr>
+<tr><td>Panel UI</td><td><code>8125</code></td><td>团队记忆管理面板</td></tr>
+<tr><td>Knowledge</td><td><code>8424</code></td><td>Wiki / Code-Graph 服务（Swagger 在 <code>/docs</code>）</td></tr>
+<tr><td>Proxy</td><td><code>8096</code></td><td>LLM 请求代理（Anthropic / OpenAI 双协议）</td></tr>
+</tbody></table>
+</div>
+<h2 id="verifysh-都检查什么"><a class="header" href="#verifysh-都检查什么">verify.sh 都检查什么</a></h2>
+<p>建议第一次部署前跑一次干跑。它会依次验证：Docker 可用性、<code>.env</code> 存在且必填字段没有遗留 <code>REPLACE_ME</code> 占位、本地镜像是否存在（仅警告）、端口占用情况（仅警告）、以及<strong>真实的 LLM 通路预检</strong>——对 openai 协议端点发 <code>GET /models</code>（零 token 消耗），对 anthropic 协议端点发一条 <code>max_tokens=1</code> 的探测消息（≤10 token）。两组 LLM 配置相同时自动去重。任何 error 会中止，warning 放行。</p>
+<p>这个预检能提前暴露最常见的部署事故：API key 写错、base URL 尾部多了或少了 <code>/v1</code>、模型名不存在、公司网络出口被墙。</p>
+<h2 id="只装-memory-hub-的轻量形态"><a class="header" href="#只装-memory-hub-的轻量形态">只装 Memory Hub 的轻量形态</a></h2>
+<p>如果本机已经有一个跑着的 Memory Core（比如源码启动的开发实例），一条命令拉起面板：</p>
+<pre><code class="language-bash">docker run -d --name tdai-memory-hub \
+  --add-host=host.docker.internal:host-gateway \
+  -p 8125:8125 -p 8424:8424 \
+  -v tdai-panel-data:/data/knowledge \
+  -e REMOTE_INSTANCE_URL=http://host.docker.internal:8420 \
+  -e REMOTE_INSTANCE_KEY=local \
+  -e KNOWLEDGE_PUBLIC_BASE_URL=http://host.docker.internal:8424/v3 \
+  -e LLM_MODE=custom \
+  -e LLM_BASE_URL=&lt;OPENAI_COMPATIBLE_BASE_URL&gt; \
+  -e LLM_API_KEY=&lt;YOUR_API_KEY&gt; \
+  -e LLM_MODEL=&lt;MODEL_ID&gt; \
+  docker.io/agentmemory/memory-hub:latest
+</code></pre>
+<p>注意 <code>KNOWLEDGE_PUBLIC_BASE_URL</code> 必须带 <code>/v3</code> 后缀且 Agent 可达；<code>REMOTE_INSTANCE_*</code> 指向你的 Core 地址。</p>
+<h2 id="停止与清理"><a class="header" href="#停止与清理">停止与清理</a></h2>
+<pre><code class="language-bash">./stop-all.sh            # 停容器，保留 volume 数据 &amp; admin key
+./stop-all.sh --purge    # 连 volume、admin key、proxy config 一起清
+</code></pre>
+<p>数据都在 named volume 里，普通 stop/start 不丢；只有 <code>--purge</code> 才是彻底重来。admin 密钥丢了又没 purge 的话，只能 purge 重建。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../getting-started/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../getting-started/first-memory.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../getting-started/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../getting-started/first-memory.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

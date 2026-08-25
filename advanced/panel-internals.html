@@ -1,0 +1,292 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>MemoryPanel 内幕：管控面架构 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/advanced/panel-internals.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="memorypanel-内幕管控面架构"><a class="header" href="#memorypanel-内幕管控面架构">MemoryPanel 内幕：管控面架构</a></h1>
+<p>Panel 的自我定位非常克制：<strong>无状态的控制台</strong>——不保存服务端登录会话、不维护本地用户库，业务数据全部由外部服务持久化。它做的只有三件事：校验调用方凭证并转发授权请求、聚合多源元数据、管理资产分配与绑定。</p>
+<h2 id="六边形架构kernel-端口与适配器"><a class="header" href="#六边形架构kernel-端口与适配器">六边形架构：kernel 端口与适配器</a></h2>
+<p>后端按六边形（端口-适配器）组织，<code>src/panel/</code> 下：</p>
+<pre><code class="language-text">config/    配置加载 + 实例注册表
+domain/    领域类型与规则（entities / chat-memory-governance / asset-id）
+http/      Hono 应用、中间件、路由（对外 API 面）
+kernel/
+  ports/     KernelHttpPort · MetaKernelPort · SkillKernelPort · KnowledgeClientPort
+  adapters/  fetch-* 实现：组装凭证头、日志脱敏、超时映射
+startup/   启动任务（如 ensure-knowledge-llm-binding）
+state/     内存态（knowledge 任务表、ingest 进度）
+</code></pre>
+<p><code>FetchKernelHttpAdapter</code> 是理解 Panel 行为的关键：</p>
+<ul>
+<li>组装 <code>Authorization: Bearer &lt;api_key&gt;</code> + <code>x-tdai-service-id</code> + 可选 <code>x-tdai-user-key</code> + <code>x-request-id</code>；</li>
+<li><strong>日志脱敏</strong>：password/api_key/token/user_key 等敏感字段打码，字段截断 300 字符、JSON 截断 1200 字符；</li>
+<li>AbortController 超时 15s，超时映射 504、网络错映射 502，统一包装为 <code>KERNEL_TIMEOUT/KERNEL_UNAVAILABLE</code> 信封。</li>
+</ul>
+<p>凭证上下文每次请求由中间件从 Header + 注册表拼出 <code>MetaCallContext</code>。Panel 自己不做权限判定，而是把 caller 的 user_key 原样透传给内核——<strong>内核才是权威的权限裁判</strong>。</p>
+<h2 id="实例注册表"><a class="header" href="#实例注册表">实例注册表</a></h2>
+<p><code>config/metadata-instances.json</code>（gitignore，仓库只留 example）描述 Panel 可连接的 Memory 实例：</p>
+<div class="table-wrapper"><table><thead><tr><th>字段</th><th>必填</th><th>含义</th></tr></thead><tbody>
+<tr><td><code>id</code></td><td>是</td><td>= <code>x-tdai-service-id</code>；本地常用 <code>default</code></td></tr>
+<tr><td><code>name</code></td><td>是</td><td>登录页展示名（唯一对外暴露的字段）</td></tr>
+<tr><td><code>gateway_endpoint</code></td><td>是</td><td>Panel → 内核转发地址，<strong>不能指 Proxy</strong></td></tr>
+<tr><td><code>proxy_endpoint</code></td><td>否</td><td>仅用于 UI 展示客户端接入地址卡片</td></tr>
+<tr><td><code>api_key</code></td><td>是</td><td>Gateway Bearer，仅服务端使用，绝不下发浏览器</td></tr>
+</tbody></table>
+</div>
+<p>zod schema 校验在 <code>src/panel/config/instance-registry.ts</code>；未命中的实例 ID 返回 400 <code>INVALID_INSTANCE</code>。</p>
+<h2 id="api-面白名单代理--聚合路由"><a class="header" href="#api-面白名单代理--聚合路由">API 面：白名单代理 + 聚合路由</a></h2>
+<p>公开入口统一 <code>/api/v1</code>，全部 POST，响应统一信封 <code>{code, message, request_id, data}</code>：</p>
+<p><strong>元数据代理</strong>（<code>routes/meta/proxy.ts</code>）：把 <code>POST /meta/{action}</code> 转发到内核 <code>/v3/meta/{action}</code>，但只放行白名单里的 55 条 action。附加了三层业务逻辑：create 类 action 先查重（重复名返回中文 409）；<code>team-member/add</code> 成功后异步给默认 Agent 导入预置 Skill（冷启动优化）；user/list 过滤隐藏内部记账用户 <code>knowledge-service</code>。</p>
+<p><strong>Chat Memory 聚合路由</strong>（<code>routes/chat-memory.ts</code>，约 2000 行，全项目最复杂的单文件）：围绕"团队资产/固定资产/我的资产"三视图提供 team-assets、agent-fixed、mine、allocate、set-agent-fixed、unbind、layer（L0-L3 分层懒加载，分别调数据面四层接口，支持 before_ts 游标分页）、import（历史对话导入）、search 等。读权限由 <code>authorizeChatMemoryRead</code> 统一：owner ∨ team 共享且是成员 ∨ 借入方。</p>
+<p><strong>消除 N+1 的专用端点</strong>：<code>task/list-with-agents</code>（一次 task 列表 + 分批并行 task-agent 查询）、<code>agent-overview/bootstrap</code>（Agent 编辑弹窗一次拉齐四类资产池 + skill 归属统计）——都是为前端体验专门设计的批量接口。</p>
+<p><strong>Knowledge 工坊路由</strong>：wiki/code-graph 的 list/create/ingest/delete/search/graph 等透传 KS；create 时幂等登记 meta_asset；<code>status-callback</code> 接收 KS 的 S2S 回调（不挂浏览器 header 校验），ready 时写资产明细、failed 不写。</p>
+<h2 id="角色模型的实现细节"><a class="header" href="#角色模型的实现细节">角色模型的实现细节</a></h2>
+<p>前端判定逻辑集中在 <code>web/src/services/permissions.ts</code> 与 <code>backendStore.ts</code>：</p>
+<ul>
+<li>System Admin 看 <code>auth/verify</code> 返回的 <code>user.user_type === 'system_admin'</code>，是全局角色；</li>
+<li>Team 内角色查 <code>roleInTeam()</code>——即 members 表记录的 <code>admin | member | reviewer</code>；</li>
+<li>判定顺序铁律：先判全局 admin 再查成员表；team owner 若不在 members 数组里按 member 兜底而非 admin（因为 UI 里 admin 语义是全局 admin，会被资源锁锁住页面）；</li>
+<li><code>canManageAsset</code>：admin 无全局资源特权，只能操作自己 owner 的资产；team admin 管本 team 资产。</li>
+</ul>
+<p>后端侧 Panel 不自行判角色——一切 owner/ACL 校验由内核完成，Panel 只是忠实透传并展示内核的裁决。</p>
+<h2 id="loadout-编辑的实现"><a class="header" href="#loadout-编辑的实现">Loadout 编辑的实现</a></h2>
+<p>Agent 编辑弹窗（<code>web/src/pages/team/components/AgentEditDialog.tsx</code> + <code>useAgentAssets.ts</code>）的数据来自 <code>/agent-overview/bootstrap</code>：</p>
+<ul>
+<li>Wiki/CodeGraph：allocate/unbind 增量 diff；</li>
+<li>Chat Memory：<code>setAgentFixed</code> 全量覆盖式同步（不含 Agent 自有记忆）；</li>
+<li>Skill：只读展示 fork 结果（fork 才是装配机制，见<a href="../panorama/asset-system.html">资产体系</a>）。</li>
+</ul>
+<p>解绑时的防御性细节：禁止解绑 auto-mint 的自有记忆（<code>chat_memory-{team}-{agent}</code>）；顺带清理 <code>canBindAsset=false</code> 的脏绑定；借入绑定受 ≤2 条上限约束（<code>MAX_IMPORTED_AGENTS</code>）。</p>
+<h2 id="启动任务ensure-knowledge-llm-binding"><a class="header" href="#启动任务ensure-knowledge-llm-binding">启动任务：ensure-knowledge-llm-binding</a></h2>
+<p>启动时 best-effort 执行（<code>startup/ensure-knowledge-llm-binding.ts</code>）：为每个实例确保 KS 有一个隐藏记账用户 <code>knowledge-service</code> 的 LLM 绑定——已有 key 只刷新 proxy_base_url；没有则走 Gateway mint 用户和 key 后推给 KS 的 <code>/v3/internal/llm-binding/set</code>。这保证了 Wiki 生成的成本总能归账到具体实例。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../advanced/knowledge-internals.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../advanced/sdk-guide.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../advanced/knowledge-internals.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../advanced/sdk-guide.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

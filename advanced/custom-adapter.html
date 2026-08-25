@@ -1,0 +1,296 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>编写自定义 Adapter - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/advanced/custom-adapter.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="编写自定义-adapter"><a class="header" href="#编写自定义-adapter">编写自定义 Adapter</a></h1>
+<p>如果你的 Agent 框架既不被 Proxy 支持、也不适合直接用 SDK 硬编码，就需要写一个 Adapter。官方的两个插件——OpenClaw 插件（TypeScript）与 Hermes 插件（Python）——就是为此而生的参考实现。</p>
+<h2 id="adapter-三步曲"><a class="header" href="#adapter-三步曲">Adapter 三步曲</a></h2>
+<p>一个最小可用的 Adapter 只需要完成三件事：</p>
+<ol>
+<li><strong>会话捕获（capture）</strong>：会话结束或每轮完成后，把对话写入 L0；</li>
+<li><strong>记忆召回（recall）</strong>：构造 Prompt 前，召回 L1/L2/L3 并以有边界、可识别的方式注入上下文；</li>
+<li><strong>工具暴露（tools，可选但推荐）</strong>：把记忆搜索暴露为模型可主动调用的工具。</li>
+</ol>
+<p>外加一条架构纪律：<strong>Adapter 保持无状态</strong>——不在插件进程内起 Gateway 子进程、不实现抽取逻辑；服务端是 L0 的权威存储，一切提炼交给 MemoryCore 的后台管线。</p>
+<h2 id="参考实现一openclaw-插件"><a class="header" href="#参考实现一openclaw-插件">参考实现一：OpenClaw 插件</a></h2>
+<p>目录 <code>MemoryCore/openclaw-plugin/</code>，插件 ID <code>memory-tencentdb-client</code>，基于 npm TS SDK 构建。</p>
+<p><strong>捕获</strong>（<code>src/hooks/capture.ts</code>）：挂 <code>agent_end</code> 钩子，提取本轮 user/assistant 消息。工程细节值得借鉴：用 position slice + timestamp cursor 做去重（防止钩子重复触发导致重复写入）、还原被框架污染的原始 prompt、<code>sanitizeText/stripCodeBlocks</code> 过滤噪音后再写 L0。</p>
+<p><strong>召回</strong>（<code>src/hooks/recall.ts</code>）：挂 <code>before_prompt_build</code> 钩子，执行 <code>searchAtomic + readCore</code>（可选加 listScenarios 场景导航），格式化后注入带标签的简洁记忆上下文。<code>recall.maxResults/includePersona/includeSceneNav</code> 可配。</p>
+<p><strong>工具</strong>（<code>src/tools/</code>）三个：</p>
+<ul>
+<li><code>tdai_memory_search</code>：L1 原子记忆搜索；</li>
+<li><code>tdai_conversation_search</code>：L0 对话搜索；</li>
+<li><code>tdai_read_cos</code>：经 COS STS 直读 Pipeline 产物（persona.md / scene_blocks/*.md）。</li>
+</ul>
+<p>安装：仓库根目录跑 <code>bash MemoryCore/scripts/install-openclaw-plugin.sh</code>。连接参数三件套：</p>
+<pre><code class="language-text">TDAI_MEMORY_ENDPOINT=http://127.0.0.1:8420
+TDAI_MEMORY_API_KEY=&lt;与 Gateway 相同的 API Key&gt;
+TDAI_MEMORY_INSTANCE_ID=default
+</code></pre>
+<h2 id="参考实现二hermes-插件"><a class="header" href="#参考实现二hermes-插件">参考实现二：Hermes 插件</a></h2>
+<p>目录 <code>MemoryCore/hermes-plugin/memory/memory_tencentdb/</code>，同一模式的 Python 映射，额外多一层生产级可靠性设计，值得所有 sidecar 型集成学习：</p>
+<ul>
+<li><strong>Gateway Supervisor</strong>（<code>supervisor.py</code>）：自动发现并以子进程拉起 Node Gateway sidecar，轮询 <code>/health</code> 确认就绪；</li>
+<li><strong>生命周期映射</strong>：<code>prefetch(query)</code> → <code>POST /recall</code> 同步注入 <code>&lt;memory-context&gt;</code>；<code>sync_turn(user, assistant)</code> → <code>POST /capture</code> 后台 daemon 线程 fire-and-forget（最多 4 并发背压）；<code>shutdown/on_session_end</code> → <code>POST /session/end</code>；</li>
+<li><strong>熔断器</strong>：连续 5 次失败暂停 60s，避免记忆服务故障拖垮主 agent；</li>
+<li><strong>诊断</strong>：sidecar stderr tail 保留用于排障。</li>
+</ul>
+<p>暴露两个 LLM 工具：<code>memory_tencentdb_memory_search</code> 与 <code>memory_tencentdb_conversation_search</code>。</p>
+<h2 id="什么时候选-adapter-而不是-proxy"><a class="header" href="#什么时候选-adapter-而不是-proxy">什么时候选 Adapter 而不是 Proxy</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>场景</th><th>推荐</th></tr></thead><tbody>
+<tr><td>主流 coding agent，想零改动获得注入</td><td>Proxy</td></tr>
+<tr><td>自研运行时，想完全控制注入时机与格式</td><td>SDK 直连（Adapter 思路内嵌）</td></tr>
+<tr><td>框架有原生插件/Hook 机制</td><td>Adapter</td></tr>
+<tr><td>只需要读记忆做分析，不需要回流</td><td>SDK 只读即可</td></tr>
+</tbody></table>
+</div>
+<h2 id="检查清单"><a class="header" href="#检查清单">检查清单</a></h2>
+<p>交付自定义 Adapter 前逐项确认：</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+所有请求带 <code>x-tdai-service-id</code>（实例隔离）；</li>
+<li><input disabled="" type="checkbox"/>
+v3 数据面调用携带完整三元组 + session_id（写路径强制）；</li>
+<li><input disabled="" type="checkbox"/>
+注入内容有明确边界标记（如 XML 标签），模型能区分"记忆"与"当前指令"；</li>
+<li><input disabled="" type="checkbox"/>
+召回结果限量限长，不挤占工作上下文；</li>
+<li><input disabled="" type="checkbox"/>
+记忆服务不可用时静默降级——主流程绝不因记忆故障中断；</li>
+<li><input disabled="" type="checkbox"/>
+不在 Adapter 本地落对话数据（服务端是唯一权威存储）；</li>
+<li><input disabled="" type="checkbox"/>
+凭证只从环境变量读取，不写入代码与配置仓库。</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../advanced/sdk-guide.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../advanced/deployment-topologies.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../advanced/sdk-guide.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../advanced/deployment-topologies.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

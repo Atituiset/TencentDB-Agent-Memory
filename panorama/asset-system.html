@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>资产体系与权限模型 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/panorama/asset-system.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="资产体系与权限模型"><a class="header" href="#资产体系与权限模型">资产体系与权限模型</a></h1>
+<p>如果说分层记忆模型解决的是"什么值得留下"，那么资产体系解决的是剩下两个问题：<strong>谁可以使用</strong>、<strong>如何装配到正确的 Agent</strong>。</p>
+<h2 id="一切皆资产"><a class="header" href="#一切皆资产">一切皆资产</a></h2>
+<p>四类内容——Chat Memory、Skill、Wiki（<code>llm_wiki</code>）、CodeGraph（<code>code_graph</code>）——在管理面被统一登记为 Asset。每个资产记录：</p>
+<ul>
+<li><code>asset_id</code> / <code>asset_type</code></li>
+<li><strong>owner</strong>（归属用户，自动拥有管理权）</li>
+<li><code>team_id</code>（归属团队）</li>
+<li><strong>visibility</strong>（可见性）</li>
+<li>版本、状态与使用统计</li>
+</ul>
+<p>统一建模的好处是权限逻辑只写一遍：无论是一段 Chat Memory 还是一个 CodeGraph，"谁能读、谁能管、能绑给谁"走的是同一套校验。</p>
+<h2 id="四级可见性"><a class="header" href="#四级可见性">四级可见性</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">可见性</th><th style="text-align: left">语义</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>private</code></td><td style="text-align: left">只有 Owner 可读，团队管理员也不例外</td></tr>
+<tr><td style="text-align: left"><code>team</code></td><td style="text-align: left">团队成员可读，Owner/Admin 负责管理</td></tr>
+<tr><td style="text-align: left"><code>restricted</code></td><td style="text-align: left">通过 User / Role / Agent ACL 精确授权</td></tr>
+<tr><td style="text-align: left"><code>agent</code></td><td style="text-align: left">用于同团队 Agent 的定向装配</td></tr>
+</tbody></table>
+</div>
+<p>这套分级的设计哲学是：<strong>新记忆和 Skill 默认私有，分享是一个明确动作，不是默认泄漏。</strong> 你可以把"发布 Skill"配给 Release Agent，把"架构 Wiki"配给所有开发 Agent，把 CodeGraph 同时给 Coder 和 Reviewer——每一步授权都显式发生。</p>
+<h2 id="角色的两层结构"><a class="header" href="#角色的两层结构">角色的两层结构</a></h2>
+<p>权限主体分两层，混为一谈会出很多"灵异问题"：</p>
+<p><strong>全局层：System Admin。</strong> 由用户记录的 <code>user_type === 'system_admin'</code> 标识，与是否加入任何 Team 无关。职责是管理用户与团队（建团队、录入成员）。v2.0.0 起 admin 也可使用 Wiki、CodeGraph、Skill 等资产管理功能。</p>
+<p><strong>Team 内层：Admin 与 Member。</strong> <code>team.members</code> 表中每个成员带 <code>admin | member | reviewer</code> 角色，负责团队内的资产协作与权限控制。</p>
+<p>判定顺序有一条铁律：先判全局角色，再查 team 成员表。资产操作权上还有一个刻意的收敛——<strong>admin 不再拥有全局资源特权，只能操作自己 owner 的资产</strong>；team admin 可管理本 team 资产。"运维口"（admin 管人）与"应用口"（业务用户管资产）的分离是官方推荐的使用姿势。</p>
+<h2 id="fixed-binding--aclloadout-的实现"><a class="header" href="#fixed-binding--aclloadout-的实现">Fixed Binding + ACL：Loadout 的实现</a></h2>
+<p>Agent 的记忆装配由两个机制配合完成：</p>
+<p><strong>Fixed Binding（固定绑定）</strong> 是一张 <code>agent ↔ asset</code> 关联表，每条绑定记录 <code>{ asset_id, asset_type, injection_mode, priority, created_by }</code>。Chat Memory / Wiki / CodeGraph 走这条路：</p>
+<ul>
+<li>Wiki/CodeGraph 绑定用 <code>injection_mode='tool'</code>——运行时渲染为 <code>&lt;knowledge_tools&gt;</code> 工具说明块，Agent 按需调用而非全量注入；</li>
+<li>Chat Memory 借入用 <code>'summary'</code> 模式；</li>
+<li>绑定接口是全量覆盖式 set（没有增量端点），所以上层都是"list → append/remove → set"的组合；</li>
+<li>每个 Agent 自动拥有一条 id 形如 <code>chat_memory-{team_id}-{agent_id}</code> 的自有记忆资产，默认 private 且固定绑定不可解绑。</li>
+</ul>
+<p><strong>ACL（访问控制表）</strong> 处理 restricted 场景的精确授权：<code>acl/grant {user_id, asset_id, action: read|write|use}</code>，读门控统一走 <code>acl/check</code>。Owner-only 语义由内核保证。</p>
+<p>一个反直觉但合理的设计：<strong>Skill 不走 binding，而是 fork 副本。</strong> 因为运行时的 <code>&lt;available_skills&gt;</code> 注入和面板的"固定资产"视图都按 <code>owner_agent_id</code> 过滤，仅改 ACL 对这两处无效；所以把 Skill 配给某个 Agent 的唯一机制，是复制一份 owner=目标 Agent 的副本（唯一约束 <code>(team_id, owner_agent_id, name)</code>）。理解了这一点，就理解了为什么面板上的 Skill 操作是"Fork 到 Agent"而不是"绑定"。</p>
+<h2 id="切私密不清理绑定的取舍"><a class="header" href="#切私密不清理绑定的取舍">切私密不清理绑定的取舍</a></h2>
+<p>还有一个体现工程判断的细节：当资产从 <code>team</code> 改回 <code>private</code> 时，系统<strong>不会</strong>级联清理已有的 Agent 绑定（"脏绑定"）。原因是在内核权限模型下，caller 只能操作自己 owner 的 agent，跨 owner 清理会 403；而保留脏绑定是无害的——下游注入、memory-bridge 和详情页在读取侧都会按当前可见性过滤（<code>apply_visibility_filter=true</code>）。把一致性检查从写入侧挪到读取侧，换来了操作的原子性和简单性。</p>
+<h2 id="面板上的落点"><a class="header" href="#面板上的落点">面板上的落点</a></h2>
+<p>这些概念在 Memory Hub 里对应的具体操作：</p>
+<ul>
+<li><strong>组队</strong>：建立 Team，加入人和 Agent，确定共享边界；</li>
+<li><strong>资产背包</strong>：打开、搜索、审核和管理四类资产；</li>
+<li><strong>Agent Loadout 编辑</strong>：在 Agent 编辑弹窗里为它增删 Wiki/CodeGraph/Chat Memory 绑定、查看 Skill fork 情况；</li>
+<li><strong>权限切换</strong>：在 private/team/restricted 之间调整可见性，必要时通过 ACL 收回共享。</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../panorama/memory-model.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../panorama/dataflow.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../panorama/memory-model.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../panorama/dataflow.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

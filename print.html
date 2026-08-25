@@ -1,0 +1,1897 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>TencentDB Agent Memory 深度指南</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="agent-记忆的问题意识"><a class="header" href="#agent-记忆的问题意识">Agent 记忆的问题意识</a></h1>
+<h2 id="从一个很实际的问题出发"><a class="header" href="#从一个很实际的问题出发">从一个很实际的问题出发</a></h2>
+<p>使用 AI Agent 工作一段时间后，几乎每个人都会遇到同样的挫败感：<strong>重复劳动</strong>。</p>
+<p>项目背景讲过了，换个 Session 就得再讲一遍。文档读过了，每个新 Agent 都要从第一页重读。一套排障方法已经跑通了，下次遇到同类问题，Agent 还是会从零摸索。这些成本不是一次性的，而是随着每一次新会话、每一个新 Agent、每一位新成员不断重付。</p>
+<p>TencentDB Agent Memory 的出发点，就是对准这个问题：<strong>怎样减少使用 Agent 时的重复工作？</strong></p>
+<p>答案不是"把聊天记录存下来"。存下来的对话只是化石——它能证明发生过什么，却不能让下一个 Agent 少走弯路。真正有价值的，是从对话中提炼出的那些<strong>可复用的经验</strong>：</p>
+<pre><code class="language-text">已有信息 → 可复用记忆资产 → 更少 Turns → 更少返工 → 更稳定的结果和更高的效率
+</code></pre>
+<p>所以这个项目对 Memory 的定义比"记住对话"要宽得多：<strong>凡是能让下一个 Agent 少走弯路的信息，都应该被保存、组织并复用。</strong></p>
+<h2 id="三类最典型的浪费"><a class="header" href="#三类最典型的浪费">三类最典型的浪费</a></h2>
+<p>把"重复工作"拆开看，至少有三类浪费是当前 Agent 工作流的常态：</p>
+<p><strong>第一类：关于人和约束的上下文反复丢失。</strong> "别重构旧的鉴权模块，移动端还在用它。"——这类代价很高的上下文，本不该靠人每次口头提醒。用户的偏好、项目的约束、历史上的关键决策，这些信息散落在过去的对话里，却没有一个地方让它们持续生效。</p>
+<p><strong>第二类：已经练会的技能无法继承。</strong> 一个 Agent 花了四十轮对话才搞明白的上线检查流程、SQL 优化手法、Review 关注点，在会话结束时就蒸发了。下一个 Agent（甚至是同一个 Agent 的下一次会话）只能重新踩坑。</p>
+<p><strong>第三类：文档和代码的理解成本每次重付。</strong> Agent 接手任务的第一个动作往往是遍历文件目录、通读文档来建立认知。这份学习成本你已经付过了——付给上一个 Agent 的时候。它应该变成存档，而不是每次重新支付。</p>
+<h2 id="记忆的价值在于流动与继承"><a class="header" href="#记忆的价值在于流动与继承">记忆的价值在于流动与继承</a></h2>
+<p>如果记忆只存在单个 Agent 的私有空间里，它的价值是有上限的。真正放大价值的是<strong>团队化</strong>：工作中产生资产，资产在团队中流动，新成员进来直接读档。</p>
+<p>这正是本项目 Memory Hub 的设计核心——面向 Agent 团队的记忆中枢，让经验完成一个完整的循环：</p>
+<ol>
+<li><strong>自动沉淀资产</strong>：从对话和任务中生成 Chat Memory 与 Skill，把文档和代码变成 Wiki 与 CodeGraph，再统一管理、审核和路由。</li>
+<li><strong>可迁移、兼容多 Agent</strong>：记忆资产与 Agent 框架解耦，可以跨框架迁移，也可以由团队内的多个 Agent、多个成员共享和维护。</li>
+<li><strong>冷启动友好</strong>：导入已有文档、代码库和历史对话 Session，新的 Agent 团队从现有经验开始工作，不必从头学起。</li>
+</ol>
+<h2 id="benchmark-的佐证"><a class="header" href="#benchmark-的佐证">Benchmark 的佐证</a></h2>
+<p>这套理念有一个可量化的检验：在 PersonaMem 基准上（它专门检验 Agent 能否在长期交互后正确理解和运用用户信息），不启用本项目时得分 48%，启用后达到 <strong>76%</strong>，相对提升 <strong>+59%</strong>。</p>
+<p>数字本身不是重点；重点是它验证了一个朴素的判断——<strong>当记忆被结构化地沉淀并按需召回时，Agent 对"人"和"事"的理解会发生质变，而不是量变。</strong></p>
+<h2 id="本书的阅读路径"><a class="header" href="#本书的阅读路径">本书的阅读路径</a></h2>
+<p>本书按四个层次组织：</p>
+<ul>
+<li><strong>Part I 介绍</strong>：回答"为什么"和"是什么"，建立核心概念词汇表。</li>
+<li><strong>Part II 全景</strong>：画出完整架构图和数据流，让你在动手之前先看清全貌。</li>
+<li><strong>Part III 入门</strong>：从一键部署到第一次看到记忆在面板里生长，跟着做就能跑通。</li>
+<li><strong>Part IV 进阶</strong>：深入各组件源码内幕——生成管线、召回算法、注入策略、权限实现、SDK 与自定义 Adapter 开发，以及生产级部署形态。</li>
+</ul>
+<p>如果你只想快速用起来，读完 Part III 即可；如果你想改造它、贡献代码，或者在生产环境大规模部署，Part IV 是为你准备的。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tencentdb-agent-memory-是什么"><a class="header" href="#tencentdb-agent-memory-是什么">TencentDB Agent Memory 是什么</a></h1>
+<h2 id="一句话定位"><a class="header" href="#一句话定位">一句话定位</a></h2>
+<p>TencentDB Agent Memory 是一套开源的 <strong>Agent 记忆基础设施</strong>：它把 Agent 工作中产生的对话、技能、文档理解与代码理解，沉淀为四类可管理的<strong>记忆资产</strong>，并通过一个团队化的 Hub 让这些资产在人、Agent 与框架之间流动、复用与继承。项目由腾讯 TencentDB 团队发起，MIT 协议开源，全部服务基于 Node.js（&gt;= 22.16）构建。</p>
+<h2 id="四个大脑器官"><a class="header" href="#四个大脑器官">四个"大脑器官"</a></h2>
+<p>项目的功能版图可以概括为四个互相配合的子系统，每个对应一种记忆资产：</p>
+<h3 id="chat-memory能记住人和事的大脑"><a class="header" href="#chat-memory能记住人和事的大脑">Chat Memory：能记住人和事的大脑</a></h3>
+<p>Chat Memory 保留用户的偏好、事实、决策和交互历史，并按 L0 → L3 四层逐级提炼（详见<a href="intro/../panorama/memory-model.html">记忆模型</a>）。每个 Agent 创建时自动获得一份独立记忆，下次对话不必从自我介绍开始。</p>
+<p>它的设计动机很直接："别重构旧鉴权模块，移动端还在用。"——这种代价高昂的上下文，不应该依赖人每次提醒，也不应该随着会话关闭而消失。</p>
+<h3 id="skill-库会积累经验的肌肉记忆"><a class="header" href="#skill-库会积累经验的肌肉记忆">Skill 库：会积累经验的肌肉记忆</a></h3>
+<p>Agent 做完复杂工作后，系统可以从对话和工具调用中<strong>提炼</strong>出可复用的 Skill——排障流程、Review 要点、上线检查清单。需要时再注入到指定 Agent 的上下文中。</p>
+<p>这里的 Skill 不只是一段 Prompt：它有<strong>版本、资源文件、触发边界、执行步骤和验证规则</strong>。个人 Skill 默认私有；经过审核后可分享给团队，再装配给其他 Agent。"练会一次，全队可用"是它的目标。</p>
+<h3 id="wiki--codegraph同时看懂文档和代码的知识地图"><a class="header" href="#wiki--codegraph同时看懂文档和代码的知识地图">Wiki + CodeGraph：同时看懂文档和代码的知识地图</a></h3>
+<ul>
+<li><strong>Wiki</strong> 把产品文档、设计方案和运维手册交给 LLM 抽取为结构化页面，并自动生成页面间的链接图谱（这一思路源自 Andrej Karpathy 的 "LLM Wiki" 构想）。Agent 不必先读完所有文件目录再开工，而是可以搜索、沿链接下钻。</li>
+<li><strong>CodeGraph</strong> 对代码库建立索引：符号、文件、调用关系和影响路径。Agent 不仅能查到"代码在哪"，还能在动手改代码之前先做 impact analysis——"改了这里可能影响哪"。</li>
+</ul>
+<p>两者平时都只是<strong>可调用的工具</strong>，只有真正需要时才进入上下文，避免整库注入撑爆窗口。</p>
+<h3 id="memory-hub-面板由人掌握的操作台"><a class="header" href="#memory-hub-面板由人掌握的操作台">Memory Hub 面板：由人掌握的操作台</a></h3>
+<p>Memory Hub 不是一块展示数据的展板，而是一个操作台：在这里建 Team、录成员、创建 Agent，审核、分享并配装记忆资产，统一管理 Owner、版本、状态、可见性与使用次数。人始终握有最终控制权——分享是一个明确的动作，而不是默认的泄漏。</p>
+<h2 id="系统形态三件套--一组接入件"><a class="header" href="#系统形态三件套--一组接入件">系统形态：三件套 + 一组接入件</a></h2>
+<p>从部署视角看，项目由三个核心服务组成（通常用 Docker 一键拉起）：</p>
+<div class="table-wrapper"><table><thead><tr><th>服务</th><th>默认端口</th><th>职责</th></tr></thead><tbody>
+<tr><td>Memory Core</td><td>8420</td><td>记忆存储与处理、元数据管理、Skill 数据面</td></tr>
+<tr><td>Memory Hub（Panel + Knowledge）</td><td>8125 / 8424</td><td>团队管理面板 + Wiki/CodeGraph 引擎</td></tr>
+<tr><td>Proxy</td><td>8096</td><td>LLM 请求透明代理：会话初始化、记忆注入、对话回流</td></tr>
+</tbody></table>
+</div>
+<p>围绕这三个服务，项目提供两类接入方式：</p>
+<ol>
+<li><strong>Proxy 接入（零代码）</strong>：把 Claude Code、CodeBuddy、Codex、WorkBuddy、DeepSeek Harness、Hermes、OpenClaw 等 Agent 的 API base URL 指向 Proxy 即可。协议不变、代码不改，不需要插件、Hook 或 MCP Server。</li>
+<li><strong>SDK / Adapter 接入（深度定制）</strong>：TypeScript 与 Python SDK 直接对接 Memory Core Gateway；OpenClaw 插件与 Hermes 插件则示范了自研 Adapter 的标准姿势。</li>
+</ol>
+<h2 id="一个具象的玩法一个人的公司"><a class="header" href="#一个具象的玩法一个人的公司">一个具象的玩法：一个人的公司</a></h2>
+<p>README 里有一个广为流传的例子，值得在这里重述，因为它浓缩了整套产品的使用哲学——给一个人的公司组一支会成长的 Agent 队伍：</p>
+<pre><code class="language-text">Tiny but Serious Inc.
+├── 👤 You · 定目标 / 做判断
+├── 🔭 Scout · 查资料 / 找机会
+├── 🛠 Builder · 写代码 / 做产品
+├── 🧪 Reviewer · 测试 / 挑毛病
+└── 🧠 Agent Memory · 让经验留在队伍里
+</code></pre>
+<p>这不是开四个彼此失联的聊天窗口，而是在组一支角色不同、能够继承团队经验的 Agent 小队。招人之后还要配装备——每个角色拿到不同的 Loadout：</p>
+<pre><code class="language-text">🔭 Scout
+   ├── 用户访谈 Chat Memory
+   ├── 市场研究 Wiki
+   └── 竞品分析 Skill
+
+🛠 Builder
+   ├── 产品 Wiki
+   ├── 项目 CodeGraph
+   └── Feature Delivery Skill
+
+🧪 Reviewer
+   ├── 历史事故 Chat Memory
+   ├── 项目 CodeGraph
+   └── Release Checklist Skill
+</code></pre>
+<p>不同角色、不同装配：少给噪音，多给它完成工作真正需要的记忆。公司可以很小，经验可以一直复利。</p>
+<h2 id="技术实现要解决的三个问题"><a class="header" href="#技术实现要解决的三个问题">技术实现要解决的三个问题</a></h2>
+<p>项目在技术上的自我约束可以概括为一句话：不追求"存下所有东西"，而是解决三个问题——<strong>什么值得留下、谁可以使用、下一次怎样少拿但拿对</strong>。这三个问题分别对应本书全景篇将要展开的三条技术主线：</p>
+<ol>
+<li><strong>记忆不是平铺记录，而是逐层生长</strong>（L0–L3 分层 + 异步提炼管线）；</li>
+<li><strong>记忆不是全局 Prompt，而是 Agent 的 Loadout</strong>（Fixed Binding + ACL 决定每个 Agent 能带走哪些资产）；</li>
+<li><strong>知识不整库注入，而是按需调用</strong>（Wiki/CodeGraph 以 tools 协议按需读取）。</li>
+</ol>
+<p>后续章节将逐条展开这些机制的实现细节。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="核心概念资产team-与-loadout"><a class="header" href="#核心概念资产team-与-loadout">核心概念：资产、Team 与 Loadout</a></h1>
+<p>在深入架构之前，先建立一套贯穿全书的词汇表。这套概念体系是理解所有后续设计的前提——几乎每一个 API、每一张表、每一段注入逻辑，都围绕它们展开。</p>
+<h2 id="记忆资产memory-asset"><a class="header" href="#记忆资产memory-asset">记忆资产（Memory Asset）</a></h2>
+<p>Chat Memory、Skill、Wiki 和 CodeGraph 在系统内被统一登记为<strong>记忆资产</strong>。资产是权限、版本与路由的基本单位，每个资产都携带这些属性：</p>
+<ul>
+<li><strong>Owner</strong>：资产的归属用户，自动获得该资产的管理权；</li>
+<li><strong>Team</strong>：资产归属的团队容器；</li>
+<li><strong>可见性</strong>：<code>private</code> / <code>team</code> / <code>restricted</code> / <code>agent</code>（详见<a href="intro/../panorama/asset-system.html">资产体系</a>）；</li>
+<li><strong>版本与状态</strong>：Skill 有显式版本链；Wiki/CodeGraph 有构建状态机；</li>
+<li><strong>使用记录</strong>：最近是否被使用、被哪些 Agent 绑定。</li>
+</ul>
+<p>点开一条资产时，面板关心的不只是"它写了什么"，还有"它从哪来、是哪个版本、分给了谁、最近是否被使用"。这是它与一个"聊天记录仓库"最本质的区别。</p>
+<h2 id="组织三元组team--agent--task"><a class="header" href="#组织三元组team--agent--task">组织三元组：Team / Agent / Task</a></h2>
+<p>Coding Agent 使用记忆必须落到具体的三元组上：</p>
+<p><strong>Team（团队）</strong> 是一组资产的归属容器。memory、skill、knowledge 都归 Team 所有，成员关系决定了谁能读写哪些资产。</p>
+<p><strong>Agent（智能体）</strong> 是 Team 内的角色化执行者。创建时要填写清晰的 <code>description</code> 和 system prompt（角色说明），例如"bug-fix 工程师""前端评审 agent""SQL 优化师"。注意一个容易混淆的点：在这个体系里，Agent 是<strong>被管理的元数据实体和调用方</strong>——MemoryCore 不负责托管、调度或运行 Agent 本身。</p>
+<p><strong>Task（任务）</strong> 是"这一次工作的抓手"，比如"修复登录页 XSS""上线 v1.4 灰度"。Task 是可选的：不建 Task 也能用，但 L2/L3 记忆会缺 Task 维度；对话中产生的记忆会关联到当前 Task 上，成为日后回溯的线索。</p>
+<p>三元组加上 User 一起构成了 v3 数据面的强隔离维度：几乎所有 <code>/v3/*</code> 接口都要求 <code>team_id</code>、<code>agent_id</code>、<code>user_id</code> 三元组（通过请求体或 <code>x-tdai-*</code> Header 传入），可选的 <code>session_id</code> 进一步限定会话范围。</p>
+<h2 id="loadoutagent-的记忆装配"><a class="header" href="#loadoutagent-的记忆装配">Loadout：Agent 的记忆装配</a></h2>
+<p>传统做法是把一大段"全局记忆"塞进 system prompt，所有人共享、所有会话都背。本项目的做法完全不同：每个 Agent 通过 <strong>Fixed Binding + ACL</strong> 决定它能带走哪些资产。</p>
+<p>运行时的决策顺序是：先按 Team、User、Agent 和可见性缩小权限范围，再按当前问题做语义召回。于是：</p>
+<ul>
+<li>团队可以共享经验，却不必共享全部隐私；</li>
+<li>换 Agent 或换框架，只需重新装配，不必重新训练；</li>
+<li>不同角色拿到不同的装配——Scout 不需要 Release Checklist，Reviewer 不需要市场研究 Wiki。</li>
+</ul>
+<p>"配装备"这个比喻值得记住：Memory Hub 里给 Agent 绑定资产的页面，本质上就是在编辑它的 Loadout。</p>
+<h2 id="memory-instance-与-spaceid"><a class="header" href="#memory-instance-与-spaceid">Memory Instance 与 spaceId</a></h2>
+<p><strong>Memory Instance（记忆实例）</strong> 是 Memory Core 中一组数据的逻辑隔离单元。每个请求都必须通过 <code>x-tdai-service-id</code> Header 声明自己属于哪个实例；本地部署通常固定叫 <code>default</code>。在 Proxy 的 URL 路径里，实例 ID 以 <code>&lt;spaceId&gt;</code> 的形式出现：</p>
+<pre><code class="language-text">http://127.0.0.1:8096/claude-code/default
+                            └─ agent-source ─┘└spaceId┘
+</code></pre>
+<p>多租户部署时，不同实例的数据、配置乃至 Pipeline 状态彼此独立。</p>
+<h2 id="会话初始化session-init"><a class="header" href="#会话初始化session-init">会话初始化（Session Init）</a></h2>
+<p>当一个 coding agent 第一次经过 Proxy 对话时，Proxy 会拦截请求并引导完成一次<strong>会话绑定</strong>：依次选择本次会话所属的 Team → Agent → Task（可选）。绑定完成后：</p>
+<ul>
+<li>后续每一轮请求自动注入所选 Agent 的 L2/L3 记忆、Skill 与 Knowledge；</li>
+<li>原始对话（L0）自动回流到 MemoryCore；</li>
+<li>同一进程内的后续轮次不再重复询问。</li>
+</ul>
+<p>对 Claude Code 这类交互式客户端，选择以原生问答工具的形式弹出；对无法响应交互表单的平台，则通过 <code>x-team-id</code> / <code>x-agent-id</code> / <code>x-task-id</code> 请求头直接注册。</p>
+<h2 id="数据面与管理面"><a class="header" href="#数据面与管理面">数据面与管理面</a></h2>
+<p>最后一条分界线是 <strong>数据面</strong> 与 <strong>管理面</strong> 的分离：</p>
+<ul>
+<li><strong>数据面</strong>处理记忆内容本身：写入 L0、检索 L1/L2/L3、Skill 的增删改查与抽取。它要求完整的三元组隔离。</li>
+<li><strong>管理面</strong>处理元信息：User、Team、Agent、Task、Asset 及其权限关系（<code>/v3/meta/*</code>），以及知识资产的登记（<code>/v3/knowledge/*</code>）、自定义 Prompt（<code>/v3/memory-prompt/*</code>）等。</li>
+</ul>
+<p>Panel 是管理面的主要消费者；Proxy 和各 Adapter 主要工作在数据面上。理解这条线，后面阅读 API 列表和源码目录时会顺畅很多。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="它不是聊天记录仓库也不是普通-rag"><a class="header" href="#它不是聊天记录仓库也不是普通-rag">它不是聊天记录仓库，也不是普通 RAG</a></h1>
+<p>给一个新系统定位，最好的方式之一是说清楚它<strong>不是</strong>什么。本章把 TencentDB Agent Memory 放在两个常见参照物旁边——聊天历史存档和普通 RAG——通过对比来呈现它的设计取舍。</p>
+<h2 id="与聊天历史rag-的三方对比"><a class="header" href="#与聊天历史rag-的三方对比">与聊天历史、RAG 的三方对比</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">能力</th><th style="text-align: center">聊天历史</th><th style="text-align: center">普通 RAG</th><th style="text-align: center">TencentDB Agent Memory</th></tr></thead><tbody>
+<tr><td style="text-align: left">跨会话理解用户</td><td style="text-align: center">△</td><td style="text-align: center">△</td><td style="text-align: center">✅ Chat Memory</td></tr>
+<tr><td style="text-align: left">沉淀可执行经验</td><td style="text-align: center">—</td><td style="text-align: center">—</td><td style="text-align: center">✅ Skill</td></tr>
+<tr><td style="text-align: left">文档结构与关系</td><td style="text-align: center">—</td><td style="text-align: center">△ 切片检索</td><td style="text-align: center">✅ Wiki + Link Graph</td></tr>
+<tr><td style="text-align: left">代码调用与影响范围</td><td style="text-align: center">—</td><td style="text-align: center">△ 文本命中</td><td style="text-align: center">✅ CodeGraph</td></tr>
+<tr><td style="text-align: left">Owner / 版本 / 状态</td><td style="text-align: center">—</td><td style="text-align: center">—</td><td style="text-align: center">✅</td></tr>
+<tr><td style="text-align: left">团队分享与 Agent 配装</td><td style="text-align: center">—</td><td style="text-align: center">—</td><td style="text-align: center">✅</td></tr>
+<tr><td style="text-align: left">私有 / 团队 / ACL</td><td style="text-align: center">—</td><td style="text-align: center">△</td><td style="text-align: center">✅</td></tr>
+</tbody></table>
+</div>
+<p>这张表值得逐行咀嚼，因为每一行背后都是一个具体的设计决策。</p>
+<h2 id="rag-解决能查到什么这里还要解决谁可以用哪个版本有效应该给哪个-agent"><a class="header" href="#rag-解决能查到什么这里还要解决谁可以用哪个版本有效应该给哪个-agent">RAG 解决"能查到什么"，这里还要解决"谁可以用、哪个版本有效、应该给哪个 Agent"</a></h2>
+<p>普通 RAG 系统的核心循环是：切片 → 向量化 → 相似度检索 → 塞进上下文。它回答的问题只有一个："给定查询，语料库里有什么相关的？"</p>
+<p>但团队场景的真实问题要复杂得多：</p>
+<ul>
+<li><strong>谁可以用？</strong> 一份包含客户事故细节的排障记录，也许该给本团队的 Agent 读，但不该出现在其他部门的上下文里。RAG 的向量库没有"权限"这个维度。</li>
+<li><strong>哪个版本有效？</strong> 排障方法会迭代，文档会更新。检索出来的那条 2024 年的 SOP 还是当前的最佳实践吗？</li>
+<li><strong>应该给哪个 Agent？</strong> Release Checklist 对 Reviewer 是关键资产，对 Scout 是纯噪音。全局注入既浪费 token 又稀释注意力。</li>
+</ul>
+<p>所以本项目把记忆组织为带 Owner、版本、可见性和绑定关系的<strong>资产</strong>，先做权限收敛（Team / User / Agent / ACL），再做语义召回。"先鉴权、后召回"这个顺序是不可颠倒的。</p>
+<h2 id="结构化理解-vs-切片命中"><a class="header" href="#结构化理解-vs-切片命中">结构化理解 vs 切片命中</a></h2>
+<p>RAG 处理文档的方式是把它们切成片段。这在"找一段相关文字"时够用，但在两类任务上明显不足：</p>
+<p><strong>需要结构时。</strong> "这份部署手册的整体流程是什么？""A 方案和 B 方案的取舍依据在哪一节？"——这些问题需要的是文档的骨架和页面间的关系，而不是零散的段落。Wiki 引擎用 LLM 把文档抽取成结构化页面并构建链接图谱，让 Agent 可以像浏览站点一样下钻（详见 <a href="intro/../advanced/knowledge-internals.html">MemoryKnowledge 内幕</a>）。</p>
+<p><strong>需要语义关联时。</strong> "改了这个函数会影响哪些调用方？"——文本相似度检索对此无能为力，因为"调用"关系不体现在字面上。CodeGraph 直接索引符号与调用边，把 impact analysis 变成一次图查询。</p>
+<h2 id="经验-vs-记录"><a class="header" href="#经验-vs-记录">经验 vs 记录</a></h2>
+<p>最后是 Skill 与对话记录的区别。一条聊天记录说"我们是这样解决连接池泄漏的"；一个 Skill 则把这个过程提炼为：触发条件是什么、按什么步骤操作、如何验证结果生效、有哪些注意事项和版本。前者是化石，后者是可以被再次执行的程序。</p>
+<p>这也是为什么 Skill 子系统有完整的版本管理、资源文件存储和审核流——它的设计目标是被<strong>复用</strong>，而不只是被<strong>查到</strong>。</p>
+<h2 id="三条技术主线的预告"><a class="header" href="#三条技术主线的预告">三条技术主线的预告</a></h2>
+<p>把上面的差异收拢起来，就是项目在技术实现上反复强调的三个"不是……而是……"：</p>
+<ol>
+<li><strong>记忆不是平铺记录，而是逐层生长</strong> —— L0 到 L3 的分层模型与异步提炼管线；</li>
+<li><strong>记忆不是全局 Prompt，而是 Agent 的 Loadout</strong> —— Fixed Binding + ACL 的装配机制；</li>
+<li><strong>知识不整库注入，而是按需调用</strong> —— <code>/v3/tools/list</code> + <code>/v3/tools/call</code> 的工具化协议。</li>
+</ol>
+<p>全景篇接下来的章节会把这三条主线逐一落到架构和数据流上。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="总体架构四个服务--一组-sdk"><a class="header" href="#总体架构四个服务--一组-sdk">总体架构：四个服务 + 一组 SDK</a></h1>
+<h2 id="部署视图"><a class="header" href="#部署视图">部署视图</a></h2>
+<p>把所有组件拉起来之后，你的机器上会出现这样一张拓扑图：</p>
+<pre><code class="language-text">        ┌──────────────────────────────┐
+        │   编码 Agent / 自定义应用      │
+        │  Claude Code · CodeBuddy ·    │
+        │  Codex · dsh · Hermes · ...   │
+        └───────────┬──────────────────┘
+                    │ OpenAI / Anthropic 协议（不改动）
+                    ▼
+            MemoryProxy :8096  ═══► 上游 LLM（OpenAI-compatible）
+             │        │
+             │        │ 浏览器 HTTP
+             ▼        ▼
+   MemoryCore :8420   Memory Hub :8125/:8424
+   记忆数据面+管理面     Panel UI + Knowledge Service
+</code></pre>
+<p>四个服务各司其职，彼此之间只通过 HTTP 通信：</p>
+<ul>
+<li><strong>MemoryProxy（:8096）</strong> 是 Agent 与上游 LLM 之间的透明代理。它在请求转发的前后"顺手"完成会话初始化、记忆注入、对话回流、鉴权与用量上报。对客户端和上游模型来说它都是不可见的——协议原样转发。</li>
+<li><strong>MemoryCore（:8420）</strong> 是记忆与元数据核心。所有 Memory / Skill / Knowledge 元信息的读写最终都落在它身上。Proxy 自己<strong>不落任何记忆数据</strong>——这是一条重要的分工边界：Proxy 管"接入与转发"，Core 管"存储与处理"。</li>
+<li><strong>Memory Panel（:8125 生产 / :8123 开发）</strong> 是无状态的 Web 管理控制台。它不保存登录会话、不维护本地用户库，只做凭证校验与请求转发聚合。</li>
+<li><strong>Knowledge Service（:8424 生产 / :8421 开发）</strong> 是 Wiki 与 CodeGraph 引擎，负责知识内容的解析、索引和检索。</li>
+</ul>
+<h2 id="分层视图"><a class="header" href="#分层视图">分层视图</a></h2>
+<p>从职责上切，系统可以分为四层：</p>
+<pre><code class="language-text">┌─────────────────────────────────────────────────────────┐
+│ 接入层   Proxy（零代码注入）· OpenClaw/Hermes 插件 · SDK    │
+├─────────────────────────────────────────────────────────┤
+│ 数据面   Memory L0-L3 · Skill RAG · Knowledge 检索         │
+│         （MemoryCore :8420  +  MemoryKnowledge :8421）    │
+├─────────────────────────────────────────────────────────┤
+│ 管理面   Team/Agent/Task/Asset 元信息 · 权限 · Loadout 绑定 │
+│         （MemoryCore /v3/meta/* ← Panel 转发）             │
+├─────────────────────────────────────────────────────────┤
+│ 存储     SQLite(FTS5/sqlite-vec) · 本地文件/COS ·          │
+│         可选 TCVDB 向量库 · 可选 Redis                     │
+└─────────────────────────────────────────────────────────┘
+</code></pre>
+<p>这个分层里最值得注意的设计是<strong>管理面与数据面共用同一个 Gateway 进程</strong>（都在 :8420 上），但走不同的路由前缀（<code>/v3/meta/*</code> vs <code>/v3/conversation|atomic|skill/*</code>），并且使用不同强度的身份凭证（管理面要求 <code>x-tdai-user-key</code> 用户级密钥，数据面主要靠 Bearer API Key + 三元组隔离参数）。这让单机部署极简，又不妨碍未来拆分。</p>
+<h2 id="存储视图"><a class="header" href="#存储视图">存储视图</a></h2>
+<p>默认形态下（standalone 模式），整个系统的持久化需求出乎意料地轻：</p>
+<ul>
+<li><strong>SQLite</strong> 一个文件搞定元数据、L0-L3 记录、Skill 索引（FTS5 全文 + sqlite-vec 向量）；</li>
+<li><strong>本地文件目录</strong>（默认 <code>~/.memory-tencentdb/memory-tdai</code>）存放 Pipeline 产物（persona.md、scene_blocks）、Skill 资源文件和大对象；</li>
+<li>除调用 LLM API 外<strong>没有必需的外部服务</strong>——不需要 Redis、不需要向量数据库就能完整跑通。</li>
+</ul>
+<p>同时，每个环节都预留了升级通道：向量检索可切换到腾讯云 VectorDB（TCVDB）获得服务端原生混合检索；大对象可 offload 到 COS；多节点部署时 Proxy 状态可切换到 Redis 或 COS 后端。这种"单机开箱即用、按需逐级放大"的姿态贯穿全部组件。</p>
+<h2 id="关键设计不变量"><a class="header" href="#关键设计不变量">关键设计不变量</a></h2>
+<p>阅读源码之前，先记住几条贯穿全项目的工程决策，它们解释了大量看似奇怪的代码结构：</p>
+<p><strong>双部署形态对称。</strong> <code>deployMode: standalone | service</code> 是第一分叉。standalone 下一切状态在进程内（内存队列、setTimeout 定时器、checkpoint 文件）；service 模式下状态外置（Redis Stream 任务队列、分片 ZSET 定时器、分布式锁）。两种模式共享同一套业务 handler。</p>
+<p><strong>全链路降级而非崩溃。</strong> sqlite-vec 加载失败 → 降级为纯 BM25；jieba 缺失 → 正则切词；Embedding 未配置 → 只用关键词召回。几乎每个依赖都有 fallback，故障被记录为日志标签而不是异常中断。</p>
+<p><strong>幂等与可追溯。</strong> 写入按 record_id upsert；Skill 更新用乐观锁；每次 L1/L2/L3 生成都会落一条 Generation Log（记录 Prompt ID、版本、内容哈希），形成完整的证据链。</p>
+<p><strong>缓存友好的上下文分层。</strong> 召回结果刻意拆成两类：跨轮稳定的内容追加到 system prompt 尾部（命中 prompt cache），每轮变化的内容前置到 user prompt（不污染缓存）。这是 Proxy 注入管线和 Core 召回接口共同遵守的约定。</p>
+<p>接下来的四节将逐一走进四个组件的内部。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="组件巡礼coreknowledgepanelproxy"><a class="header" href="#组件巡礼coreknowledgepanelproxy">组件巡礼：Core、Knowledge、Panel、Proxy</a></h1>
+<h2 id="memorycore记忆与元数据核心"><a class="header" href="#memorycore记忆与元数据核心">MemoryCore：记忆与元数据核心</a></h2>
+<p>MemoryCore 统一存储并提供三类数据能力：</p>
+<ul>
+<li><strong>Memory</strong>：L0 对话、L1 原子记忆、L2 场景记忆和 L3 核心画像的存储、生成与召回；</li>
+<li><strong>Knowledge 元信息</strong>：Wiki、CodeGraph 等知识源的标识、类型、状态与关联关系（注意：只存元信息，不存内容——内容解析在 Knowledge Service）；</li>
+<li><strong>资产管理元信息</strong>：User、Team、Agent、Task、Skill、Knowledge Asset 及成员、归属、访问关系。</li>
+</ul>
+<p>它以 Standalone Runtime 形态开源，默认监听 <code>127.0.0.1:8420</code>，使用 SQLite 与本地文件，进程内维护 Pipeline 状态。源码的主要版图：</p>
+<pre><code class="language-text">MemoryCore/src/
+├── core/        L0–L3 记忆域模型、Skill 子系统、Prompt 模板、hooks
+├── gateway/     HTTP Gateway、v2/v3 路由、各业务 handler
+├── services/    Pipeline Scanner / Worker / 调度
+├── metadata/    v3 管理面路由与服务（权限校验）
+├── store/       SQLite / TCVDB 存储抽象、BM25、Embedding
+├── utils/       Pipeline Manager（standalone/service 双形态）
+├── openclaw-plugin/   OpenClaw 轻量 Adapter
+└── hermes-plugin/     Hermes Memory Provider
+</code></pre>
+<p>对外 API 以 <code>/v3/*</code> 为推荐面（v2 兼容保留）。所有业务调用都必须携带 <code>x-tdai-service-id</code> 声明实例。</p>
+<h2 id="memoryknowledge知识引擎"><a class="header" href="#memoryknowledge知识引擎">MemoryKnowledge：知识引擎</a></h2>
+<p>Knowledge Service 是用户侧 Wiki + Code-Graph 引擎，基于 Hono 构建，API 前缀 <code>/v3</code>。它的四块核心能力：</p>
+<div class="table-wrapper"><table><thead><tr><th>能力</th><th>说明</th></tr></thead><tbody>
+<tr><td>LLM-Wiki</td><td>上传/拉取文档 → LLM 抽取结构化页面 → FTS5 全文检索 + 知识图谱</td></tr>
+<tr><td>Code-Graph</td><td>git clone 仓库 → CodeGraph 索引（符号、调用、文件树）→ 探索查询</td></tr>
+<tr><td>Auto-Sync</td><td>可选：定时扫描 code-graph，FIFO 队列 + worker pool 自动拉取更新重建索引</td></tr>
+<tr><td>Tools 协议</td><td><code>POST /v3/tools/list</code>、<code>/v3/tools/call</code>，供 Agent 自发现调用</td></tr>
+</tbody></table>
+</div>
+<p>一个容易忽略但关键的机制是 <strong>llm_binding</strong>：生产链路中 Wiki 生成所用的 LLM 由 Panel 按 <code>x-tdai-service-id</code> 推送绑定（走 Proxy 计费），而不是 KS 自己配置——这样 Wiki 生成的成本可以归账到具体实例。ingest/sync 完成后，KS 会回调 Panel 写回远端元数据。</p>
+<p>KS 还提供 MCP stdio 通道（12 个查询类工具），让支持 MCP 的宿主获得与 HTTP tools 等价的能力。</p>
+<h2 id="memorypanel团队记忆控制台"><a class="header" href="#memorypanel团队记忆控制台">MemoryPanel：团队记忆控制台</a></h2>
+<p>Team Memory Control 是<strong>无状态的</strong>管理控制台：不保存服务端登录会话、不维护本地用户库，业务数据全部由外部服务持久化。这个定位决定了它的架构——一个精致的"转发 + 聚合"层：</p>
+<ul>
+<li><strong>kernel 层</strong>采用端口-适配器模式（六边形架构）：<code>MetaKernelPort</code>、<code>SkillKernelPort</code>、<code>KnowledgeClientPort</code> 等接口定义了对内核的全部依赖，fetch 实现负责组装凭证头、日志脱敏与超时映射；</li>
+<li><strong>实例注册表</strong> <code>metadata-instances.json</code> 描述了 Panel 可连接的所有 Memory 实例（ID、Gateway 地址、API Key），真实文件不入库；</li>
+<li><strong>公开 API</strong> 统一挂在 <code>/api/v1</code> 下，对元数据操作做白名单代理（55 条 action），对 Chat Memory 等复杂场景提供聚合路由（消除前端 N+1 请求）；</li>
+<li><strong>前端</strong>是 React 18 + Zustand 的 SPA：工作台任务看板、Wiki 工坊、CodeGraph 工坊、Skill 库、Chat Memory 三视图、成员管理与 Agent 编辑。</li>
+</ul>
+<p>安全上 Panel 有几条铁律：用户凭证 <code>user_key</code> 只经 Header 传递；注册表中的 <code>api_key</code> 仅服务端使用绝不下发浏览器；提交前跑 <code>secret-scan.sh</code>。</p>
+<h2 id="memoryproxy透明-llm-代理"><a class="header" href="#memoryproxy透明-llm-代理">MemoryProxy：透明 LLM 代理</a></h2>
+<p>Proxy 是整个体系里"魔法"最集中的地方——也是设计上最克制的地方。克制在于：<strong>它对协议零修改</strong>，OpenAI <code>/v1/chat/completions</code> 和 Anthropic <code>/v1/messages</code> 原样转发；魔法在于转发前后的一进一出里完成了八件事：</p>
+<pre><code class="language-text">POST /proxy/&lt;spaceId&gt;/v1/chat/completions | /v1/messages
+   ├─ 1. auth ─────── 校验 x-tdai-user-key，解析出 user_id
+   ├─ 2. systemUser ─ 命中内部账号则短路透传
+   ├─ 3. sessionInit ─ 首次对话弹表单：team → agent → task
+   ├─ 4. injection ── system prompt 注入 skill / knowledge / memory
+   ├─ 5. rateLimit ── spaceId × 最终模型 TPM/QPM 限流
+   ├─ 6. forward ──── 转发到上游 LLM
+   ├─ 7. extract ──── 一轮结束后异步回流 conversation + L0
+   └─ 8. report ───── ClickHouse / Langfuse / Opik / Credit 上报
+</code></pre>
+<p>支撑这些动作的子系统包括：五后端的统一存储抽象（cos/sqlite/fs/memory + redis）、按 agent name 覆盖上游的路由表、<code>mem:</code> 会话指令拦截、以及可选的一致性哈希负载均衡网关。进阶篇有专章拆解。</p>
+<h2 id="sdk-与插件"><a class="header" href="#sdk-与插件">SDK 与插件</a></h2>
+<p><strong>SDK</strong>（TypeScript / Python）覆盖 v3 数据面与管理面的全部端点：</p>
+<ul>
+<li><code>MemoryClient</code>：L0-L3 读写与检索，构造时强制三元组隔离；</li>
+<li><code>SkillClient</code>：Skill 全生命周期 + 对话增量摄取；</li>
+<li><code>MetadataClient</code>：约 60 个管理面方法；</li>
+<li><code>MemoryPromptClient</code> / <code>MemoryGenerationLogClient</code>：自定义 Prompt 与生成溯源。</li>
+</ul>
+<p>Python 版同时提供同步与异步客户端（httpx）。</p>
+<p><strong>插件</strong>示范了 Adapter 的标准姿势。OpenClaw 插件做三件事：<code>agent_end</code> 钩子捕获对话写 L0、<code>before_prompt_build</code> 钩子召回注入、暴露三个记忆查询工具。Hermes 插件是同一模式的 Python 映射，额外带 Gateway sidecar 进程监督与熔断。自研 Adapter 的完整指引见<a href="panorama/../advanced/custom-adapter.html">编写自定义 Adapter</a>。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="记忆模型l0--l3-的分层生长"><a class="header" href="#记忆模型l0--l3-的分层生长">记忆模型：L0 → L3 的分层生长</a></h1>
+<p>分层是整个记忆体系最重要的结构决策。本章先讲清每层存什么、为什么这样切，再讲层与层之间如何转化。</p>
+<h2 id="四层的定义"><a class="header" href="#四层的定义">四层的定义</a></h2>
+<p>对话首先作为 L0 原样保存，再由异步 Pipeline 提炼为不同粒度的记忆：</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">层级</th><th style="text-align: left">名称</th><th style="text-align: left">保存什么</th><th style="text-align: left">主要用途</th></tr></thead><tbody>
+<tr><td style="text-align: left"><strong>L0</strong></td><td style="text-align: left">Conversation</td><td style="text-align: left">原始对话与完整上下文</td><td style="text-align: left">核对原话、时间和来源</td></tr>
+<tr><td style="text-align: left"><strong>L1</strong></td><td style="text-align: left">Atom</td><td style="text-align: left">从对话提取的事实、偏好、约束与事件</td><td style="text-align: left">精确召回可执行信息</td></tr>
+<tr><td style="text-align: left"><strong>L2</strong></td><td style="text-align: left">Scenario / Profile</td><td style="text-align: left">围绕项目或场景组织的知识块（Agent Profile）</td><td style="text-align: left">快速恢复一个工作场景</td></tr>
+<tr><td style="text-align: left"><strong>L3</strong></td><td style="text-align: left">Core / Persona</td><td style="text-align: left">长期画像、稳定模式与高层认知</td><td style="text-align: left">让 Agent 迅速进入用户和团队语境</td></tr>
+</tbody></table>
+</div>
+<p>一个类比：L0 是原始录音，L1 是会议纪要里的逐条要点，L2 是按项目归档的案例卷宗，L3 是对这个人和这支团队的"人物侧写"。</p>
+<h2 id="为什么必须分层"><a class="header" href="#为什么必须分层">为什么必须分层</a></h2>
+<p>如果只有一层"记忆库"，会立刻撞上两个矛盾：</p>
+<p><strong>召回精度 vs 上下文效率。</strong> 直接在 L0 上做检索，能找到原话但噪音极大——一段闲聊里可能只有一个关键约束。而 L1 把事实提炼成原子条目后，检索的命中质量完全不同。反过来，如果只存 L1，又会丢失"这句话到底是怎么说的"这类需要回溯原文的场景。</p>
+<p><strong>进入语境的速度 vs 事实的准确。</strong> 每次对话都从 L0 重建认知太慢；只靠 L3 的画像又容易过度概括。实际可用的策略是分层的组合拳：<strong>平时用 L2/L3 快速进入语境，需要具体事实时再通过检索回到 L1/L0。</strong></p>
+<p>生成和召回都遵循这个分层逻辑，且召回结果还会经过条数、字符预算和超时限制——避免记忆反过来占满上下文，喧宾夺主。</p>
+<h2 id="层间转化异步提炼管线"><a class="header" href="#层间转化异步提炼管线">层间转化：异步提炼管线</a></h2>
+<p>L1/L2/L3 不是实时生成的。写入 L0 后，后台 Pipeline 按条件触发：</p>
+<pre><code class="language-text">L0 写入 ──► [Pipeline Scanner] ──► 任务队列 ──► [Pipeline Worker]
+                                                    │
+                    ┌───────────────────────────────┤
+                    ▼                 ▼             ▼
+              L1 抽取(原子化)    L2 场景归纳     L3 画像更新
+</code></pre>
+<p>触发节奏有几个精心设计的细节：</p>
+<ul>
+<li><strong>按轮数触发</strong>：默认每积累 N 轮对话（<code>everyNConversations</code>，默认 5）跑一次 L1；</li>
+<li><strong>预热机制</strong>：冷启动阶段阈值按 1 → 2 → 4 → 8 → … 翻倍爬升到 N，保证最初的几轮对话也能尽快产出第一批记忆，而不是让新用户等五轮才看到第一条 L1；</li>
+<li><strong>空闲触发</strong>：会话闲置超过 <code>l1IdleTimeoutSeconds</code> 也会触发，避免"差一轮永远不跑"；</li>
+<li><strong>层级依赖</strong>：L2/L3 在 L1 的基础上归纳，形成 L0 → L1 → L2/L3 的依赖链。</li>
+</ul>
+<p>提炼由 LLM 完成，每一层有固定的输出协议：L1 是 JSON 原子条目，L2 是 Scene Markdown，L3 是 Persona/Doctrine 文档。协议本身不可被自定义 Prompt 修改（只能调整关注点与归纳策略），这保证了下游消费方的稳定性。</p>
+<h2 id="存储形态"><a class="header" href="#存储形态">存储形态</a></h2>
+<p>各层的落盘方式并不一致，这是理解源码时的重要背景：</p>
+<ul>
+<li><strong>L0/L1</strong> 以结构化记录存于 SQLite（或 TCVDB），支持 FTS5 全文 + 向量双路检索；</li>
+<li><strong>L2/L3</strong> 本体是 Markdown 文件（<code>profiles/{scope}/scene_blocks/*.md</code>、<code>persona.md</code>），存本地目录或 COS，元数据行在数据库中登记；</li>
+<li>每次生成都记录溯源引用（用了哪个 Prompt 的哪个版本、输入来自哪些 L0/L1），支持按 Memory ID 反查生成日志。</li>
+</ul>
+<h2 id="召回时的分层策略"><a class="header" href="#召回时的分层策略">召回时的分层策略</a></h2>
+<p>Proxy 和 Adapter 在组装上下文时对四层的用法截然不同，这个对照表在进阶篇会反复出现：</p>
+<div class="table-wrapper"><table><thead><tr><th>层级</th><th>接入 prompt 的方式</th></tr></thead><tbody>
+<tr><td>L0</td><td>不注入。通过只读搜索工具供模型主动查询</td></tr>
+<tr><td>L1</td><td>不直接注入。通过工具接口按需召回（保护 KV cache）</td></tr>
+<tr><td>L2</td><td>Agent Profile，直接注入 system prompt</td></tr>
+<tr><td>L3</td><td>Team/Global 记忆，直接注入 system prompt</td></tr>
+</tbody></table>
+</div>
+<p>一句话总结这个设计的动机：<strong>稳定的进缓存，易变的走工具。</strong> L2/L3 变化频率低，注入后可以命中上游的 prompt cache；L0/L1 每轮都在变，一旦内联注入就会击穿缓存，所以暴露成模型可以主动调用的检索工具。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="资产体系与权限模型"><a class="header" href="#资产体系与权限模型">资产体系与权限模型</a></h1>
+<p>如果说分层记忆模型解决的是"什么值得留下"，那么资产体系解决的是剩下两个问题：<strong>谁可以使用</strong>、<strong>如何装配到正确的 Agent</strong>。</p>
+<h2 id="一切皆资产"><a class="header" href="#一切皆资产">一切皆资产</a></h2>
+<p>四类内容——Chat Memory、Skill、Wiki（<code>llm_wiki</code>）、CodeGraph（<code>code_graph</code>）——在管理面被统一登记为 Asset。每个资产记录：</p>
+<ul>
+<li><code>asset_id</code> / <code>asset_type</code></li>
+<li><strong>owner</strong>（归属用户，自动拥有管理权）</li>
+<li><code>team_id</code>（归属团队）</li>
+<li><strong>visibility</strong>（可见性）</li>
+<li>版本、状态与使用统计</li>
+</ul>
+<p>统一建模的好处是权限逻辑只写一遍：无论是一段 Chat Memory 还是一个 CodeGraph，"谁能读、谁能管、能绑给谁"走的是同一套校验。</p>
+<h2 id="四级可见性"><a class="header" href="#四级可见性">四级可见性</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">可见性</th><th style="text-align: left">语义</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>private</code></td><td style="text-align: left">只有 Owner 可读，团队管理员也不例外</td></tr>
+<tr><td style="text-align: left"><code>team</code></td><td style="text-align: left">团队成员可读，Owner/Admin 负责管理</td></tr>
+<tr><td style="text-align: left"><code>restricted</code></td><td style="text-align: left">通过 User / Role / Agent ACL 精确授权</td></tr>
+<tr><td style="text-align: left"><code>agent</code></td><td style="text-align: left">用于同团队 Agent 的定向装配</td></tr>
+</tbody></table>
+</div>
+<p>这套分级的设计哲学是：<strong>新记忆和 Skill 默认私有，分享是一个明确动作，不是默认泄漏。</strong> 你可以把"发布 Skill"配给 Release Agent，把"架构 Wiki"配给所有开发 Agent，把 CodeGraph 同时给 Coder 和 Reviewer——每一步授权都显式发生。</p>
+<h2 id="角色的两层结构"><a class="header" href="#角色的两层结构">角色的两层结构</a></h2>
+<p>权限主体分两层，混为一谈会出很多"灵异问题"：</p>
+<p><strong>全局层：System Admin。</strong> 由用户记录的 <code>user_type === 'system_admin'</code> 标识，与是否加入任何 Team 无关。职责是管理用户与团队（建团队、录入成员）。v2.0.0 起 admin 也可使用 Wiki、CodeGraph、Skill 等资产管理功能。</p>
+<p><strong>Team 内层：Admin 与 Member。</strong> <code>team.members</code> 表中每个成员带 <code>admin | member | reviewer</code> 角色，负责团队内的资产协作与权限控制。</p>
+<p>判定顺序有一条铁律：先判全局角色，再查 team 成员表。资产操作权上还有一个刻意的收敛——<strong>admin 不再拥有全局资源特权，只能操作自己 owner 的资产</strong>；team admin 可管理本 team 资产。"运维口"（admin 管人）与"应用口"（业务用户管资产）的分离是官方推荐的使用姿势。</p>
+<h2 id="fixed-binding--aclloadout-的实现"><a class="header" href="#fixed-binding--aclloadout-的实现">Fixed Binding + ACL：Loadout 的实现</a></h2>
+<p>Agent 的记忆装配由两个机制配合完成：</p>
+<p><strong>Fixed Binding（固定绑定）</strong> 是一张 <code>agent ↔ asset</code> 关联表，每条绑定记录 <code>{ asset_id, asset_type, injection_mode, priority, created_by }</code>。Chat Memory / Wiki / CodeGraph 走这条路：</p>
+<ul>
+<li>Wiki/CodeGraph 绑定用 <code>injection_mode='tool'</code>——运行时渲染为 <code>&lt;knowledge_tools&gt;</code> 工具说明块，Agent 按需调用而非全量注入；</li>
+<li>Chat Memory 借入用 <code>'summary'</code> 模式；</li>
+<li>绑定接口是全量覆盖式 set（没有增量端点），所以上层都是"list → append/remove → set"的组合；</li>
+<li>每个 Agent 自动拥有一条 id 形如 <code>chat_memory-{team_id}-{agent_id}</code> 的自有记忆资产，默认 private 且固定绑定不可解绑。</li>
+</ul>
+<p><strong>ACL（访问控制表）</strong> 处理 restricted 场景的精确授权：<code>acl/grant {user_id, asset_id, action: read|write|use}</code>，读门控统一走 <code>acl/check</code>。Owner-only 语义由内核保证。</p>
+<p>一个反直觉但合理的设计：<strong>Skill 不走 binding，而是 fork 副本。</strong> 因为运行时的 <code>&lt;available_skills&gt;</code> 注入和面板的"固定资产"视图都按 <code>owner_agent_id</code> 过滤，仅改 ACL 对这两处无效；所以把 Skill 配给某个 Agent 的唯一机制，是复制一份 owner=目标 Agent 的副本（唯一约束 <code>(team_id, owner_agent_id, name)</code>）。理解了这一点，就理解了为什么面板上的 Skill 操作是"Fork 到 Agent"而不是"绑定"。</p>
+<h2 id="切私密不清理绑定的取舍"><a class="header" href="#切私密不清理绑定的取舍">切私密不清理绑定的取舍</a></h2>
+<p>还有一个体现工程判断的细节：当资产从 <code>team</code> 改回 <code>private</code> 时，系统<strong>不会</strong>级联清理已有的 Agent 绑定（"脏绑定"）。原因是在内核权限模型下，caller 只能操作自己 owner 的 agent，跨 owner 清理会 403；而保留脏绑定是无害的——下游注入、memory-bridge 和详情页在读取侧都会按当前可见性过滤（<code>apply_visibility_filter=true</code>）。把一致性检查从写入侧挪到读取侧，换来了操作的原子性和简单性。</p>
+<h2 id="面板上的落点"><a class="header" href="#面板上的落点">面板上的落点</a></h2>
+<p>这些概念在 Memory Hub 里对应的具体操作：</p>
+<ul>
+<li><strong>组队</strong>：建立 Team，加入人和 Agent，确定共享边界；</li>
+<li><strong>资产背包</strong>：打开、搜索、审核和管理四类资产；</li>
+<li><strong>Agent Loadout 编辑</strong>：在 Agent 编辑弹窗里为它增删 Wiki/CodeGraph/Chat Memory 绑定、查看 Skill fork 情况；</li>
+<li><strong>权限切换</strong>：在 private/team/restricted 之间调整可见性，必要时通过 ACL 收回共享。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="一次请求的完整旅程"><a class="header" href="#一次请求的完整旅程">一次请求的完整旅程</a></h1>
+<p>架构图是静态的，系统真正的性格体现在数据流动上。本章跟随一次典型的 Claude Code 会话，看数据如何在四个服务之间穿行——先看"去程"（请求如何被增强），再看"回程"（对话如何变成记忆），最后看旁路的异步管线。</p>
+<h2 id="去程一次被增强的-llm-调用"><a class="header" href="#去程一次被增强的-llm-调用">去程：一次被增强的 LLM 调用</a></h2>
+<p>假设你已经在面板上建好了 Team、Agent 和 Task，并按 <code>ANTHROPIC_BASE_URL=http://127.0.0.1:8096/claude-code/default</code> 启动了 Claude Code。当你发出第一句话：</p>
+<p><strong>① 鉴权。</strong> Proxy 收到 <code>POST /claude-code/default/v1/messages</code>，取出 <code>x-tdai-user-key</code>（即你的 <code>sk-mem-...</code>），调用 MemoryCore 的 <code>POST /v3/meta/auth/verify</code> 反查出 <code>user_id</code>。此后全链路以这个用户身份行事。</p>
+<p><strong>② 会话初始化（仅首次）。</strong> Proxy 发现这是新会话，把请求暂存，向 Claude Code 返回一个 <code>AskUserQuestion</code> 工具调用——在终端里呈现为三连问：选 Team → 选 Agent → 选 Task（可跳过）。选择结果与 session 绑定后持久化；同一进程内的后续轮次不再询问。</p>
+<p><strong>③ 注入。</strong> 确定绑定后，注入管线开始组装 system prompt 的附加内容：</p>
+<pre><code class="language-text">&lt;tdai_profile_memory&gt;   ← Agent 的 L2 场景块 + L3 画像（读自 Core）
+&lt;cloud_skills&gt;          ← 与当前问题相关的 Skill 摘要（RAG 检索）
+&lt;skill_tools&gt;           ← 如何通过工具读写 Skill 的说明
+&lt;knowledge_tools&gt;       ← 该 Agent 绑定的 Wiki/CodeGraph 两步自发现协议
+&lt;session_context&gt;       ← 本次会话绑定的 agent/task 信息
+</code></pre>
+<p>L0/L1 刻意不在其中——它们以 <code>&lt;tdai_memory_tools&gt;</code> 只读工具的形式存在，让模型在需要时主动查询，避免每轮变化的检索结果击穿上游 KV cache。</p>
+<p><strong>④ 限流与转发。</strong> 按 <code>spaceId × 最终模型</code> 做 60 秒滑动窗口限流后，请求原样转发到 <code>.env</code> 里配置的上游 LLM。</p>
+<h2 id="回程对话变成记忆"><a class="header" href="#回程对话变成记忆">回程：对话变成记忆</a></h2>
+<p>上游返回后，Proxy 在响应流结束的瞬间触发两个异步动作：</p>
+<p><strong>Skill 归档回流</strong>：本轮对话切片被发送到 MemoryCore 的 <code>/v3/skill/conversation/add</code>——进入 Skill 抽取的对话缓冲区，供后台判断"这是否包含一条值得沉淀的可复用方法"。</p>
+<p><strong>L0 写入</strong>：完整对话写入 MemoryCore 的 L0 存储。到此为止，用户的等待时间几乎没有增加——所有重活都在后台。</p>
+<h2 id="旁路异步提炼管线"><a class="header" href="#旁路异步提炼管线">旁路：异步提炼管线</a></h2>
+<p>MemoryCore 内部，Pipeline Scanner 注意到某会话的新增轮数达到阈值（默认 5 轮，冷启动预热期更快），把任务投给 Pipeline Worker：</p>
+<ol>
+<li><strong>L1 抽取</strong>：LLM 读对话片段，产出原子记忆条目（事实/偏好/约束/事件），并与已有条目做去重合并；</li>
+<li><strong>L2 归纳</strong>：满足条件时，相关 L1 被归纳为场景块（Scene Markdown），挂到对应 Agent 的 Profile 下；</li>
+<li><strong>L3 更新</strong>：跨场景的稳定模式最终汇入长期画像（Persona）。</li>
+</ol>
+<p>每次生成都会写一条 Generation Log（用了哪个 Prompt、什么版本、输入输出引用），面板里可以按 Memory ID 精确溯源。</p>
+<p>与此同时，如果这轮对话触发了 Skill 抽取判定，一条新 Skill 进入待审状态——它有版本号、资源文件和验证规则，等你在面板上审核后分享给团队。</p>
+<h2 id="知识资产的旁路循环"><a class="header" href="#知识资产的旁路循环">知识资产的旁路循环</a></h2>
+<p>Wiki 和 CodeGraph 有自己独立的生命周期。你在面板上传一批文档或登记一个 Git 仓库后：</p>
+<pre><code class="language-text">Panel ──► Knowledge Service ──► 异步构建（LLM 抽取 / clone+索引）
+   ▲                               │
+   └──── status-callback ──────────┘
+         （ready/failed + 进度事件 + 自动摘要）
+</code></pre>
+<p>构建完成后 Panel 写回资产元数据，资产即可被绑定到 Agent。之后文档更新可以重新 ingest，代码仓库可由 Auto-Sync 定期拉取重建。</p>
+<h2 id="观察这个循环"><a class="header" href="#观察这个循环">观察这个循环</a></h2>
+<p>跑通之后，有三个地方能直观看到这套循环在工作：</p>
+<ul>
+<li>面板 <strong>Chat Memory</strong> 页：L0 对话被切分的场景逐步出现；</li>
+<li><strong>Agent 详情 → Profile</strong>：L2 scene 与 L3 persona 在累积；</li>
+<li><code>curl http://localhost:8420/health | jq .services.pipelineWorker</code>：<code>tasksConsumed/tasksCompleted</code> 随对话增长。</li>
+</ul>
+<p>这就是 README 里那句话的含义："没有 Memory，Loop 可能只是更快地重复。能继承记忆，每一轮才有机会比上一轮更好。"——整个系统的本质，就是把这条循环自动化。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="快速开始总览"><a class="header" href="#快速开始总览">快速开始总览</a></h1>
+<p>本部分的目标是让你在半小时内从零跑到"看到记忆在面板里生长"。四章按真实使用顺序排列：</p>
+<ol>
+<li><strong><a href="getting-started/./quickstart.html">一键部署三件套</a></strong> —— 用官方脚本拉起 Memory Core + Memory Hub + Proxy，拿到管理员密钥。</li>
+<li><strong><a href="getting-started/./first-memory.html">建立组织结构并接入 Claude Code</a></strong> —— 登录面板建 Team/Agent/Task，把 coding agent 挂到 Proxy 上，完成第一次会话绑定，观察记忆生长。</li>
+<li><strong><a href="getting-started/./clients.html">更多客户端接入</a></strong> —— CodeBuddy、Codex、DeepSeek Harness、Hermes、OpenClaw 及任意 OpenAI 兼容平台的接入配置与差异对照。</li>
+<li><strong><a href="getting-started/./cold-start.html">冷启动：先读档再开工</a></strong> —— 把已有的代码库、文档和历史对话导入为资产，让新 Agent 团队从现有经验开始。</li>
+</ol>
+<p>最后附一页**<a href="getting-started/./troubleshooting.html">常见问题排查</a>**，收录部署后最容易踩的坑。</p>
+<h2 id="部署前的准备清单"><a class="header" href="#部署前的准备清单">部署前的准备清单</a></h2>
+<p>开始之前确认这几件事：</p>
+<ul>
+<li><strong>Docker</strong> 已安装且可用（一键部署基于 Docker Compose 式的容器编排）；</li>
+<li><strong>两组 LLM 凭证</strong>：
+<ul>
+<li><code>MEMORY_LLM_*</code>（base URL / API key / model）：供 Memory Core 的记忆提炼和 Wiki 生成内部使用，任何 OpenAI 兼容端点均可；</li>
+<li><code>PROXY_UPSTREAM_*</code>：Proxy 转发用户对话请求的上游模型——这决定你在 Claude Code 里实际对话用的模型；</li>
+</ul>
+</li>
+<li><strong>端口</strong> 8420 / 8125 / 8424 / 8096 未被占用；</li>
+<li>如果打算让局域网内其他机器访问，准备一个可路由的主机地址。</li>
+</ul>
+<blockquote>
+<p>一个常见的取舍问题：两组 LLM 可以配同一个模型。记忆提炼的任务偏轻量（抽取、归纳），给它配一个便宜快速的模型是合理的省钱姿势；<code>PROXY_UPSTREAM_*</code> 则按你的编码质量要求选。</p>
+</blockquote>
+<h2 id="三条部署路径"><a class="header" href="#三条部署路径">三条部署路径</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>路径</th><th>适合场景</th><th>入口</th></tr></thead><tbody>
+<tr><td><strong>完整三件套</strong>（推荐）</td><td>从零体验全部能力</td><td><code>deploy/global-images/start-all.sh</code></td></tr>
+<tr><td>只装 Memory Hub</td><td>本机已有 Memory Core 在跑</td><td><code>docker run agentmemory/memory-hub</code></td></tr>
+<tr><td>源码启动</td><td>二次开发、调试</td><td>各组件目录 <code>npm install &amp;&amp; npm run dev</code></td></tr>
+</tbody></table>
+</div>
+<p>本书主线走第一条；其余两条在对应章节给出最小步骤。生产部署与多节点扩展不在入门范围内，请直接阅读进阶篇的<a href="getting-started/../advanced/deployment-topologies.html">部署形态进阶</a>。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="一键部署三件套"><a class="header" href="#一键部署三件套">一键部署三件套</a></h1>
+<h2 id="拉起服务"><a class="header" href="#拉起服务">拉起服务</a></h2>
+<p>整个过程四条命令：</p>
+<pre><code class="language-bash"># 1) 拿脚本
+git clone https://github.com/TencentCloud/TencentDB-Agent-Memory.git
+cd TencentDB-Agent-Memory/deploy/global-images
+
+# 2) 准备 .env（把 LLM 相关字段填成真值）
+cp .env.example .env
+$EDITOR .env
+
+# 3) 干跑校验（可选；会真做 LLM 通路预检，加 --skip-llm 跳过）
+./verify.sh
+
+# 4) 一键起
+./start-all.sh
+</code></pre>
+<p><code>.env</code> 里最关键的是两组 LLM 参数：</p>
+<pre><code class="language-dotenv">MEMORY_LLM_BASE_URL=...      # memory + hub 内部提炼用
+MEMORY_LLM_API_KEY=...
+MEMORY_LLM_MODEL=...
+
+PROXY_UPSTREAM_URL=...       # proxy 转发到的上游（你实际对话的模型）
+PROXY_UPSTREAM_API_KEY=...
+PROXY_UPSTREAM_MODEL=...
+</code></pre>
+<h2 id="脚本背后发生了什么"><a class="header" href="#脚本背后发生了什么">脚本背后发生了什么</a></h2>
+<p>理解脚本的编排逻辑，出问题时才知道去哪看。<code>start-all.sh</code> 在 <code>tdai-memory-stack</code> 这个 Docker 网络上按依赖顺序拉起三个容器，每一步都等待健康检查通过再继续：</p>
+<p><strong>Memory Core 容器</strong>：脚本动态生成一份 standalone 模式的 Gateway 配置（开启 Skill、pipeline 每 5 轮触发、召回阈值 0.3），挂载到容器内并挂一个 named volume 做数据持久化。接着是 <strong>init-admin 流程</strong>——用 openssl 生成 <code>sk-mem-&lt;32位随机&gt;</code> 作为管理员密钥，调用 <code>/v3/internal/meta/user/init-admin</code> 注册 admin 用户；密钥以严格文件权限落盘为 <code>./.admin-key</code>，重复执行会复用已有文件。</p>
+<p><strong>Memory Hub 容器</strong>：合并镜像同时跑 Panel 与 Knowledge Service。它通过容器网络别名 <code>http://memory-core:8420</code> 连接 Core，脚本还会探测宿主机局域网 IP 以生成正确的对外访问地址。</p>
+<p><strong>Proxy 容器</strong>：同样由脚本从 <code>.env</code> 生成最小 config.yaml，打开三大开关——鉴权（auth）、会话初始化（sessionInit）、记忆接入（tdai）——即 <code>PROXY_FULL_STACK=1</code> 的完整流水线。</p>
+<p>全部就绪后，脚本打印服务地址表和一段可直接复制运行的 Claude Code 启动命令。</p>
+<h2 id="端口速查"><a class="header" href="#端口速查">端口速查</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>服务</th><th>端口</th><th>用途</th></tr></thead><tbody>
+<tr><td>Memory Core</td><td><code>8420</code></td><td>记忆读写、鉴权、skill/RAG 数据面</td></tr>
+<tr><td>Panel UI</td><td><code>8125</code></td><td>团队记忆管理面板</td></tr>
+<tr><td>Knowledge</td><td><code>8424</code></td><td>Wiki / Code-Graph 服务（Swagger 在 <code>/docs</code>）</td></tr>
+<tr><td>Proxy</td><td><code>8096</code></td><td>LLM 请求代理（Anthropic / OpenAI 双协议）</td></tr>
+</tbody></table>
+</div>
+<h2 id="verifysh-都检查什么"><a class="header" href="#verifysh-都检查什么">verify.sh 都检查什么</a></h2>
+<p>建议第一次部署前跑一次干跑。它会依次验证：Docker 可用性、<code>.env</code> 存在且必填字段没有遗留 <code>REPLACE_ME</code> 占位、本地镜像是否存在（仅警告）、端口占用情况（仅警告）、以及<strong>真实的 LLM 通路预检</strong>——对 openai 协议端点发 <code>GET /models</code>（零 token 消耗），对 anthropic 协议端点发一条 <code>max_tokens=1</code> 的探测消息（≤10 token）。两组 LLM 配置相同时自动去重。任何 error 会中止，warning 放行。</p>
+<p>这个预检能提前暴露最常见的部署事故：API key 写错、base URL 尾部多了或少了 <code>/v1</code>、模型名不存在、公司网络出口被墙。</p>
+<h2 id="只装-memory-hub-的轻量形态"><a class="header" href="#只装-memory-hub-的轻量形态">只装 Memory Hub 的轻量形态</a></h2>
+<p>如果本机已经有一个跑着的 Memory Core（比如源码启动的开发实例），一条命令拉起面板：</p>
+<pre><code class="language-bash">docker run -d --name tdai-memory-hub \
+  --add-host=host.docker.internal:host-gateway \
+  -p 8125:8125 -p 8424:8424 \
+  -v tdai-panel-data:/data/knowledge \
+  -e REMOTE_INSTANCE_URL=http://host.docker.internal:8420 \
+  -e REMOTE_INSTANCE_KEY=local \
+  -e KNOWLEDGE_PUBLIC_BASE_URL=http://host.docker.internal:8424/v3 \
+  -e LLM_MODE=custom \
+  -e LLM_BASE_URL=&lt;OPENAI_COMPATIBLE_BASE_URL&gt; \
+  -e LLM_API_KEY=&lt;YOUR_API_KEY&gt; \
+  -e LLM_MODEL=&lt;MODEL_ID&gt; \
+  docker.io/agentmemory/memory-hub:latest
+</code></pre>
+<p>注意 <code>KNOWLEDGE_PUBLIC_BASE_URL</code> 必须带 <code>/v3</code> 后缀且 Agent 可达；<code>REMOTE_INSTANCE_*</code> 指向你的 Core 地址。</p>
+<h2 id="停止与清理"><a class="header" href="#停止与清理">停止与清理</a></h2>
+<pre><code class="language-bash">./stop-all.sh            # 停容器，保留 volume 数据 &amp; admin key
+./stop-all.sh --purge    # 连 volume、admin key、proxy config 一起清
+</code></pre>
+<p>数据都在 named volume 里，普通 stop/start 不丢；只有 <code>--purge</code> 才是彻底重来。admin 密钥丢了又没 purge 的话，只能 purge 重建。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="建立组织结构并接入-claude-code"><a class="header" href="#建立组织结构并接入-claude-code">建立组织结构并接入 Claude Code</a></h1>
+<p>服务起来只是第一步。要让 coding agent 真正用上团队记忆，需要在面板里<strong>建组织结构</strong>，然后<strong>在会话里绑定它们</strong>。本章走完这条最核心的路径。</p>
+<h2 id="第-1-步登录管理面板"><a class="header" href="#第-1-步登录管理面板">第 1 步：登录管理面板</a></h2>
+<p>打开 <a href="http://localhost:8125">http://localhost:8125</a>，用 <code>start-all.sh</code> 结尾打印的 admin <code>user_key</code>（即 <code>deploy/global-images/.admin-key</code> 里的 <code>sk-mem-...</code>）登录。</p>
+<p>这里推荐养成一个好习惯——<strong>隔离运维口与应用口</strong>：</p>
+<ul>
+<li>admin 是"运维口"，用来管人（建团队、录成员）；</li>
+<li>业务用户是"应用口"，用来管资产、跑 agent。</li>
+</ul>
+<p>具体操作：在「用户管理」新建一个 <code>normal</code> 用户（面板操作或直接调 API 均可）：</p>
+<pre><code class="language-bash">ADMIN_KEY=$(cat ./.admin-key)
+curl -sS -X POST http://localhost:8420/v3/meta/user/create \
+  -H "x-tdai-user-key: $ADMIN_KEY" \
+  -H "x-tdai-service-id: default" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"you"}' | jq
+</code></pre>
+<p>返回体里的 <code>data.default_user_key</code> 是新用户的登录密钥——<strong>只在创建时返回这一次</strong>，立即保存。之后退出 admin，用这把新 key 重新登录。</p>
+<h2 id="第-2-步建-team--agent--task"><a class="header" href="#第-2-步建-team--agent--task">第 2 步：建 Team / Agent / Task</a></h2>
+<p>Coding Agent 使用记忆必须落到 <code>team / agent / task</code> 三元组上：</p>
+<ol>
+<li><strong>Team</strong>：左侧「团队」→ 新建。它是资产的归属容器。</li>
+<li><strong>Agent</strong>：进入 Team → 「Agent」→ 新建。给它填一段清晰的角色说明（description + system prompt），例如"bug-fix 工程师""前端评审 agent"。</li>
+<li><strong>Task</strong>（可选）：Team →「任务」→ 新建，比如"修复登录页 XSS"。记忆会关联到 Task；不建也能用，但 L2/L3 会缺 Task 维度。</li>
+</ol>
+<p>至少建 <strong>1 个 Team + 1 个 Agent</strong> 再继续。</p>
+<blockquote>
+<p>v2.0.1 起有冷启动优化：新建团队自带默认 Agent 并预置导入 Skill，不必从零开始配。</p>
+</blockquote>
+<h2 id="第-3-步把-claude-code-指向-proxy"><a class="header" href="#第-3-步把-claude-code-指向-proxy">第 3 步：把 Claude Code 指向 Proxy</a></h2>
+<pre><code class="language-bash">export ANTHROPIC_BASE_URL=http://127.0.0.1:8096/claude-code/default
+export ANTHROPIC_AUTH_TOKEN="&lt;业务用户的 sk-mem-...&gt;"
+claude --model &lt;PROXY_UPSTREAM_MODEL 配的模型&gt;
+</code></pre>
+<p>三个值的含义值得逐个理解：</p>
+<ul>
+<li><code>ANTHROPIC_BASE_URL</code> 把 CC 的 API 从 anthropic.com 改指本机 proxy；路径里的 <code>default</code> 是 memory 实例 ID；</li>
+<li><code>ANTHROPIC_AUTH_TOKEN</code> 是<strong>业务用户</strong>的 user_key——proxy 用它去 Core 反查身份，只有这个用户拥有的 team/agent/task 会出现在下一步的选择表单里；</li>
+<li><code>--model</code> 必须是 <code>.env</code> 里 <code>PROXY_UPSTREAM_MODEL</code> 配置过的上游模型名。</li>
+</ul>
+<h2 id="第-4-步首次会话的三连问"><a class="header" href="#第-4-步首次会话的三连问">第 4 步：首次会话的三连问</a></h2>
+<p>每开一个新的 CC 会话，proxy 会借 CC 自带的 <code>AskUserQuestion</code> 工具依次弹出：</p>
+<pre><code class="language-text">1. 请选择本次会话所属的 Team：
+   ○ Team A    ○ Team B
+2. 请选择「Team A」下要使用的 Agent：
+   ○ bug-fix 工程师    ○ 前端评审 agent
+3. 请选择关联的任务（可选）：
+   ○ 修复登录页 XSS    ○ [跳过任务关联]
+</code></pre>
+<p>箭头键选择、回车确认。选完之后 proxy 记住本次会话的绑定，后续每一轮自动注入所选 Agent 的 L2/L3 记忆、skill 与 knowledge；同一进程内不再重复询问。想换绑定的 Team/Agent？开一个新 CC 会话即可重新弹表单。</p>
+<h2 id="第-5-步观察记忆一层层长出来"><a class="header" href="#第-5-步观察记忆一层层长出来">第 5 步：观察记忆一层层长出来</a></h2>
+<p>真实工作几轮之后（改文件、跑测试、给出结论——而不是闲聊），回到面板验证循环是否转起来了：</p>
+<ul>
+<li>左侧**「记忆」→ Chat Memory**：L0 原始对话被切分出的 scene 开始出现；</li>
+<li><strong>Agent 详情页 → Profile</strong>：L2 场景块与 L3 画像逐步累积；</li>
+<li><strong>Skill 列表</strong>：如果 LLM 判定对话里有可复用的操作方法，会自动抽出候选 Skill。</li>
+</ul>
+<p>命令行侧可以用健康检查看后台管线是否在工作：</p>
+<pre><code class="language-bash">curl -s http://localhost:8420/health | jq .services.pipelineWorker
+# tasksConsumed / tasksCompleted 应随对话增长
+</code></pre>
+<h2 id="给记忆喂点什么"><a class="header" href="#给记忆喂点什么">给记忆喂点什么</a></h2>
+<p>第一次看到空面板很正常——记忆需要素材。几个立竿见影的做法：</p>
+<ul>
+<li>和 agent 做<strong>真实工作对话</strong>：让它读代码、改文件、复现一个 bug；</li>
+<li>明确说出约束和偏好："这个项目不要引入新依赖""我们统一用 pnpm"——这些会被提炼为 L1 原子记忆；</li>
+<li>完成一次复杂排障后输入 <code>mem:create-skill</code>，把过程归档为 Skill；</li>
+<li>直接导入历史对话 Session（见<a href="getting-started/./cold-start.html">冷启动</a>）。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="更多客户端接入"><a class="header" href="#更多客户端接入">更多客户端接入</a></h1>
+<p>Proxy 的设计目标是"协议不变，零代码接入"——所有客户端的共性是：<strong>把 base URL 指向 Proxy，带上用户密钥，其余配置不动</strong>。差异只在各客户端把 URL 和 Key 放在哪。</p>
+<h2 id="五种客户端对照表"><a class="header" href="#五种客户端对照表">五种客户端对照表</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>维度</th><th>Claude Code</th><th>CodeBuddy</th><th>Codex</th><th>DeepSeek Harness (dsh)</th></tr></thead><tbody>
+<tr><td>协议</td><td>Anthropic Messages</td><td>OpenAI Chat Completions</td><td>OpenAI Responses</td><td>OpenAI Chat Completions</td></tr>
+<tr><td>配置位置</td><td>环境变量</td><td><code>~/.codebuddy/models.json</code></td><td><code>~/.codex/config.toml</code></td><td><code>~/.dsh/settings.yaml</code> + <code>.credentials.yaml</code></td></tr>
+<tr><td>URL 前缀</td><td><code>/claude-code/&lt;spaceId&gt;</code></td><td><code>/codebuddy/&lt;spaceId&gt;</code></td><td><code>/codex/&lt;spaceId&gt;</code></td><td><code>/dsh/&lt;spaceId&gt;</code>（尾巴<strong>不带</strong> <code>/v1</code>）</td></tr>
+<tr><td>Key 传递</td><td>env <code>ANTHROPIC_AUTH_TOKEN</code></td><td>JSON <code>apiKey</code> 字段</td><td>TOML <code>experimental_bearer_token</code></td><td><code>.credentials.yaml</code> 环境变量</td></tr>
+<tr><td>Session init</td><td>自动弹表单</td><td>自动弹表单</td><td><strong>首次需手动切 Plan 模式</strong></td><td>自动弹表单（按钮式）</td></tr>
+</tbody></table>
+</div>
+<p>WorkBuddy（桌面端）与 CodeBuddy 同构：改 <code>~/.workbuddy/models.json</code>，URL 用 <code>/workbuddy/&lt;spaceId&gt;</code>。Hermes 与 OpenClaw 走 header 直注册模式，见下文。</p>
+<h2 id="codebuddy--workbuddy"><a class="header" href="#codebuddy--workbuddy">CodeBuddy / WorkBuddy</a></h2>
+<p>在 <code>~/.codebuddy/models.json</code> 中添加自定义模型：</p>
+<pre><code class="language-json">{
+  "models": [
+    {
+      "id": "claude-sonnet-4-20250514",
+      "name": "proxy-memory-agent",
+      "vendor": "claude",
+      "apiKey": "&lt;业务用户的 sk-mem-...&gt;",
+      "maxInputTokens": 200000,
+      "url": "http://127.0.0.1:8096/codebuddy/default",
+      "supportsToolCall": true,
+      "supportsImages": true
+    }
+  ]
+}
+</code></pre>
+<p>注意两点：<code>id</code> 必须与 Proxy 上游支持的模型匹配；<code>apiKey</code> 用业务用户的 user_key。CodeBuddy <strong>4.10.2–4.10.4 有已知 Bug</strong>（不携带 sessionId 导致 session init 失败），请用 ≥ 4.10.5 或 ≤ 4.10.1。</p>
+<h2 id="codex-cli"><a class="header" href="#codex-cli">Codex CLI</a></h2>
+<p>编辑 <code>~/.codex/config.toml</code>：</p>
+<pre><code class="language-toml">model_provider = "team-proxy"
+model = "claude-opus-4.7"
+disable_response_storage = true
+
+[model_providers.team-proxy]
+name       = "TDAI team-proxy"
+wire_api   = "responses"
+base_url   = "http://127.0.0.1:8096/codex/default"
+experimental_bearer_token = "&lt;业务用户的 sk-mem-...&gt;"
+</code></pre>
+<p>两个关键细节：<code>wire_api = "responses"</code> 必填（Codex 走 Responses 协议）；<code>disable_response_storage = true</code> 关闭本地缓存，否则第二轮起可能命中缓存跳过注入。</p>
+<p><strong>首次对话前必须切到 Plan 模式</strong>（<code>Shift+Tab</code>）：默认 Agent 模式会自动执行 proxy 返回的 session-init 表单工具、跳过用户选择，导致永远绑不上 Team/Agent/Task。选完三元组后再切回 Agent 模式正常使用。</p>
+<h2 id="deepseek-harness-dsh"><a class="header" href="#deepseek-harness-dsh">DeepSeek Harness (dsh)</a></h2>
+<p>编辑 <code>~/.dsh/settings.yaml</code>：</p>
+<pre><code class="language-yaml">llm-deepseek:
+  apiKeyEnv: PROXY_USER_KEY
+  baseURL: http://127.0.0.1:8096/dsh/default   # 尾巴不要加 /v1！
+  reasoningEffort: high
+</code></pre>
+<p>密钥放 <code>~/.dsh/.credentials.yaml</code> 的 <code>PROXY_USER_KEY:</code> 字段，并收紧权限（dsh 启动时强制检查）：</p>
+<pre><code class="language-bash">chmod 700 ~/.dsh &amp;&amp; chmod 600 ~/.dsh/.credentials.yaml
+</code></pre>
+<p>Web UI 里每个新对话首帧会渲染 4 步按钮式选择器（是否关联团队资产 → Team → Agent → Task）；CLI headless 模式 proxy 会自动检测无交互能力而 bypass session-init，直接透传。</p>
+<h2 id="hermes-与-openclawheader-直注册模式"><a class="header" href="#hermes-与-openclawheader-直注册模式">Hermes 与 OpenClaw：header 直注册模式</a></h2>
+<p>这两个框架无法响应交互式表单，因此通过请求头<strong>直接完成 session 注册</strong>，跳过弹窗：</p>
+<pre><code class="language-yaml"># Hermes ~/.hermes/config.yaml（节选）
+base_url: http://&lt;proxy-host&gt;:&lt;port&gt;/hermes/default
+api_key: &lt;user_key&gt;
+extra_headers:
+  x-team-id: &lt;team_id&gt;
+  x-agent-id: &lt;agent_id&gt;
+  x-task-id: &lt;task_id&gt;          # 当前版本必填
+  x-conversation-id: &lt;自定义会话标识&gt;
+</code></pre>
+<p>OpenClaw 在 <code>~/.openclaw/openclaw.json</code> 的 <code>models.providers</code> 里做等价配置（<code>baseUrl</code> 用 <code>/openclaw/&lt;spaceId&gt;</code>，headers 同上）。</p>
+<p>两条当前版本的已知限制要心里有数：</p>
+<ol>
+<li><strong><code>x-task-id</code> 必填</strong>——缺了它 proxy 会尝试弹表单，而这俩框架接不住，最终 session bypass（注入与回流全部失效）。切换任务需要手动改配置。</li>
+<li><strong><code>x-conversation-id</code> 静态指定</strong>——同一 ID 的所有请求共享同一 session；每次开新对话需手动更换 ID，否则沿用上次会话状态。</li>
+</ol>
+<p>官方已在路线图中计划让 task 可选并优化 conversation ID 体验。</p>
+<h2 id="其他平台通用接入法"><a class="header" href="#其他平台通用接入法">其他平台（通用接入法）</a></h2>
+<p>任何兼容 OpenAI API 的平台都能挂上来：</p>
+<pre><code class="language-text">http://&lt;proxy-host&gt;:8096/&lt;agent-source&gt;/&lt;spaceId&gt;
+</code></pre>
+<ul>
+<li><code>&lt;agent-source&gt;</code> 从 <code>claude-code / codebuddy / workbuddy / codex / hermes / openclaw</code> 中选用（其他平台可伪装成其中之一）；</li>
+<li>必带 Header：<code>Authorization: Bearer &lt;user_key&gt;</code> + 四个 <code>x-*</code> header（同上表）；</li>
+<li>缺 header 的平台将触发 session bypass——透传正常，但记忆不生效。</li>
+</ul>
+<h2 id="接入后的通用验证清单"><a class="header" href="#接入后的通用验证清单">接入后的通用验证清单</a></h2>
+<p>无论哪个客户端，接入后建议按顺序确认三件事：</p>
+<ol>
+<li>首条消息触发 session init（或 header 注册成功），面板上能看到会话绑定；</li>
+<li>对话几轮后，Core <code>/health</code> 的 pipelineWorker 计数增长；</li>
+<li>输入 <code>mem:help</code> 能返回指令帮助——说明注入管线工作正常。</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="冷启动先读档再开工"><a class="header" href="#冷启动先读档再开工">冷启动：先读档，再开工</a></h1>
+<p>多数 Agent 接手新任务的第一件事，是重新学习你的项目——遍历目录、通读文档、摸索规范。这些学习成本你早就付过了。TencentDB Agent Memory 把它们变成存档：<strong>代码库、文档、历史对话</strong>三类已有资产都可以导入，让新 Agent 团队直接从现有经验开始。</p>
+<h2 id="三条导入通道"><a class="header" href="#三条导入通道">三条导入通道</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>你有什么</th><th>导入后变成</th><th>处理方</th></tr></thead><tbody>
+<tr><td>代码库（公开 HTTPS Git 仓库）</td><td><strong>CodeGraph</strong>：符号、文件、调用关系与影响路径索引</td><td>Knowledge Service</td></tr>
+<tr><td>文档与文件（设计方案、运维手册、FAQ…）</td><td><strong>Wiki</strong>：结构化页面 + 链接图谱 + 全文检索</td><td>Knowledge Service</td></tr>
+<tr><td>历史 Agent 对话 Session</td><td><strong>Skill 与 Chat Memory</strong>：自动提取可复用方法与记忆资产</td><td>Memory Core</td></tr>
+</tbody></table>
+</div>
+<p>三者都在面板上操作，导入后异步处理——Wiki 和 CodeGraph 构建需要等待一段时间才能 <code>ready</code>（面板会显示进度）。</p>
+<h2 id="导入代码库--codegraph"><a class="header" href="#导入代码库--codegraph">导入代码库 → CodeGraph</a></h2>
+<p>在 CodeGraph 工坊登记一个仓库地址，KS 会 <code>git clone</code> 并构建索引。构建完成后：</p>
+<ul>
+<li>Agent 可以搜索代码、查 callers/callees、在改代码前做 impact analysis；</li>
+<li>把它绑定给 Builder/Reviewer 角色的 Agent（Loadout 编辑），运行时以 <code>&lt;knowledge_tools&gt;</code> 工具形式按需调用；</li>
+<li>开启 Auto-Sync 后可定时拉取 git 更新自动重建。</li>
+</ul>
+<p>当前版本优先支持公开 HTTPS 仓库；私有仓库和 SSH 凭证接入仍在完善中。</p>
+<h2 id="导入文档--wiki"><a class="header" href="#导入文档--wiki">导入文档 → Wiki</a></h2>
+<p>上传文档或文件后，LLM 会把它们抽取为结构化页面并自动生成页面间的引用图谱。价值在于两点：Agent 不必先读完所有文件再开工，可以搜索和沿链接下钻；文档之间的关系（"A 方案被 B 方案取代"这类链接）被显式保存下来。</p>
+<h2 id="导入对话--skill-与-chat-memory"><a class="header" href="#导入对话--skill-与-chat-memory">导入对话 → Skill 与 Chat Memory</a></h2>
+<p>把过去与 Agent 的对话 Session 从面板导入，系统会走与实时回流相同的管线：写入 L0、后台提炼 L1-L3、判定是否包含可抽取的 Skill。这是把"老 agent 的经验"迁移给"新 agent 队伍"最直接的路径。</p>
+<h2 id="用-loadout-完成装配"><a class="header" href="#用-loadout-完成装配">用 Loadout 完成装配</a></h2>
+<p>资产就绪后，最后一步是把它们配给正确的 Agent。打开 Agent 编辑弹窗：</p>
+<ul>
+<li>Wiki / CodeGraph / Chat Memory 走 allocate/unbind 增量绑定；</li>
+<li>Skill 通过 fork 复制到目标 Agent 名下；</li>
+<li>每个角色只配它需要的——少给噪音，多给完成工作真正需要的记忆。</li>
+</ul>
+<h2 id="一个务实的冷启动剧本"><a class="header" href="#一个务实的冷启动剧本">一个务实的冷启动剧本</a></h2>
+<p>假设你要为一支三人的 Agent 小队（Scout/Builder/Reviewer）冷启动：</p>
+<ol>
+<li>登记产品 Wiki（产品文档 + 设计方案），等 ready；</li>
+<li>登记主仓库 CodeGraph，等 ready；</li>
+<li>导入过去一个月的关键排障对话 Session；</li>
+<li>面板审核自动抽出的 Skill 候选，通过后 fork 给对应角色；</li>
+<li>给 Scout 配市场 Wiki，给 Builder 配 CodeGraph + 产品 Wiki，给 Reviewer 配 CodeGraph + 事故 Chat Memory；</li>
+<li>各自开一次会话验证 <code>&lt;knowledge_tools&gt;</code> / <code>&lt;available_skills&gt;</code> 注入正常（<code>mem:help</code> 有响应即说明链路通）。</li>
+</ol>
+<p>完成后，这支队伍的第一轮对话就已经"读过你的项目"了——不再重新训练每一个 Agent，给它读档。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="常见问题排查"><a class="header" href="#常见问题排查">常见问题排查</a></h1>
+<p>本页收录一键部署路径上最高频的问题。按"症状 → 原因 → 解法"组织。</p>
+<h2 id="会话初始化类"><a class="header" href="#会话初始化类">会话初始化类</a></h2>
+<p><strong>CC 会话没有弹选择表单？</strong></p>
+<p><code>PROXY_ENABLE_SESSION_INIT=1</code> 没开。<code>start-all.sh</code> 默认已打开；如果你手动改过 <code>.env</code> 或用 <code>PROXY_FULL_STACK=0</code> 起的，重启 proxy：<code>PROXY_FULL_STACK=1 ./start-proxy.sh</code>。</p>
+<p><strong>表单选择项空空的，或只有别人的 team？</strong></p>
+<p>确认当前账号在面板里建过 Team 和 Agent。Proxy 只列出当前 <code>user_key</code> 对应用户 own 的资产——用 admin key 但没建过资产、或用了别人的业务用户，都会看到空列表。</p>
+<p><strong>Codex 永远选不了 Team/Agent/Task？</strong></p>
+<p>首次对话前没切 Plan 模式。默认 Agent 模式会自动执行 session-init 表单的工具调用、跳过用户选择。先 <code>Shift+Tab</code> 切 Plan 再发第一条消息。</p>
+<h2 id="服务健康类"><a class="header" href="#服务健康类">服务健康类</a></h2>
+<p><strong>面板显示 "Panel API 8125 未启动"？</strong></p>
+<p><code>docker ps</code> 看 <code>tdai-memory-hub</code> 是否 healthy；不 healthy 就 <code>docker logs tdai-memory-hub</code> 找报错——大概率是 <code>REMOTE_INSTANCE_URL</code> / <code>LLM_BASE_URL</code> 之类配错。</p>
+<p><strong>本地起 Proxy 一直刷 <code>ECONNREFUSED 127.0.0.1:6379</code>？</strong></p>
+<p>示例配置默认启用 Redis，而本机没跑 Redis。纯本地开发改为 <code>redis.enabled: false</code> + <code>storage.enabled: true</code>（backend: sqlite），状态走本地 SQLite。</p>
+<p><strong>Core 起不来，提示需要 API Key？</strong></p>
+<p>非回环地址监听时必须设置 <code>TDAI_GATEWAY_API_KEY</code>。另外注意一键部署脚本有个已知约定：<code>MEMORY_CORE_GATEWAY_API_KEY</code> 需留空——proxy 的 auth 校验调用 verify 时不带 Bearer 头，强开 Gateway 层鉴权会不兼容。</p>
+<h2 id="记忆生成类"><a class="header" href="#记忆生成类">记忆生成类</a></h2>
+<p><strong>L1/L2 一直没跑起来，面板没有记忆产出？</strong></p>
+<p>最常见的两个原因：</p>
+<ul>
+<li>配置了 <code>promptMode=code</code> 但对话内容是闲聊——LLM 判定无可沉淀内容返回 0 条。改回 <code>chat</code> 或做真实工作对话（改文件、跑测试、给结论）。</li>
+<li>对话轮数还没到触发阈值。默认每 5 轮触发一次（有预热机制，前几轮更快）；会话闲置超时也会触发。可用 <code>/health</code> 的 pipelineWorker 计数确认管线是否消费了任务。</li>
+</ul>
+<p><strong>想切换到别的 team/agent？</strong></p>
+<p>新开一个 agent 会话（新窗口/新 session）就会重新弹绑定表单。</p>
+<p><strong>导入的历史会话时间线错乱？</strong></p>
+<p>v2.0.1-beta.1 已修复该问题，请升级到最新镜像。</p>
+<h2 id="客户端兼容类"><a class="header" href="#客户端兼容类">客户端兼容类</a></h2>
+<p><strong>CodeBuddy 不弹 session init？</strong></p>
+<p>版本 4.10.2–4.10.4 存在已知 Bug：请求不携带 sessionId。换 ≥ 4.10.5 或 ≤ 4.10.1。</p>
+<p><strong>Hermes/OpenClaw 记忆完全不生效？</strong></p>
+<p>按顺序检查四个 header 是否齐全且值正确：<code>x-team-id</code> / <code>x-agent-id</code> / <code>x-task-id</code> / <code>x-conversation-id</code>。缺任何一个都会 session bypass。特别注意 <code>x-task-id</code> 当前必填，以及静态 conversation ID 需要"每次新对话手动更换"。</p>
+<p><strong>dsh 报错 baseURL 相关异常？</strong></p>
+<p>检查两点：尾巴不能带 <code>/v1</code>（dsh 客户端硬编码 <code>${baseURL}/chat/completions</code>）；<code>.credentials.yaml</code> 权限必须是 600、目录 700。</p>
+<h2 id="数据与迁移类"><a class="header" href="#数据与迁移类">数据与迁移类</a></h2>
+<p><strong>从旧版升级后数据不见了/启动报格式错误？</strong></p>
+<p>v1.x/v0.x（数据格式 v2）升级到 v2.0.0+（v3）必须先跑迁移脚本再启动新版 Gateway：</p>
+<pre><code class="language-bash">python scripts/migrate-v2-to-v3/v2-to-v3-migrate.py ~/.memory-tencentdb/memory-tdai --dry-run
+# 确认无误后去掉 --dry-run 执行
+</code></pre>
+<p>迁移前务必备份整个数据目录。详见进阶篇<a href="getting-started/../advanced/upgrade-migration.html">升级与数据迁移</a>。</p>
+<h2 id="其他注意事项"><a class="header" href="#其他注意事项">其他注意事项</a></h2>
+<ul>
+<li>Wiki 与 CodeGraph 是异步构建的，导入后需等待处理完成才能 ready；</li>
+<li>全自动记忆路由仍在迭代，当前通过面板人工绑定资产即可覆盖绝大多数场景；</li>
+<li>遇到本文未覆盖的问题，到 <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/issues">GitHub Issues</a> 提交，项目方承诺 24 小时内响应。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="进阶导览"><a class="header" href="#进阶导览">进阶导览</a></h1>
+<p>从这一章开始，我们下到源码层面。进阶篇按"组件 × 主题"组织：</p>
+<p><strong>理解核心（MemoryCore）</strong></p>
+<ul>
+<li><a href="advanced/./memorycore-internals.html">存储与网关</a>：SQLite/TCVDB 存储抽象、三层鉴权、v2/v3 API 演进、双部署形态；</li>
+<li><a href="advanced/./pipeline-recall.html">生成管线与召回机制</a>：Scanner/Worker 调度、预热阈值、L1→L2→L3 提炼、BM25+向量+RRF 混合召回、缓存友好的上下文拆分；</li>
+<li><a href="advanced/./custom-prompt-lineage.html">自定义 Prompt 与生成溯源</a>：Prompt 绑定优先级、版本语义、Generation Log 证据链。</li>
+</ul>
+<p><strong>理解接入（Proxy / Adapter / SDK）</strong></p>
+<ul>
+<li><a href="advanced/./proxy-internals.html">MemoryProxy 内幕</a>：八阶段请求处理、各注入器的内容块、KV cache 保护、存储后端降级链、限流与计费；</li>
+<li><a href="advanced/./mem-commands.html"><code>mem:</code> 会话指令</a>：对话内就地操作记忆的轻量入口；</li>
+<li><a href="advanced/./sdk-guide.html">SDK 深度使用</a>：TS/Python 客户端全景、隔离模型、错误处理；</li>
+<li><a href="advanced/./custom-adapter.html">编写自定义 Adapter</a>：三步曲模式与两个参考实现。</li>
+</ul>
+<p><strong>理解知识与管理（Knowledge / Panel）</strong></p>
+<ul>
+<li><a href="advanced/./knowledge-internals.html">MemoryKnowledge 内幕</a>：Wiki ingest 流水线、CodeGraph 桥接、tools 协议、llm_binding、MCP 通道；</li>
+<li><a href="advanced/./panel-internals.html">MemoryPanel 内幕</a>：六边形 kernel 架构、白名单代理、角色模型实现。</li>
+</ul>
+<p><strong>生产实践</strong></p>
+<ul>
+<li><a href="advanced/./deployment-topologies.html">部署形态进阶</a>：standalone vs service、多节点扩展、镜像构建发布；</li>
+<li><a href="advanced/./observability.html">可观测性体系</a>：Opik/Langfuse/ClickHouse 三路上报与日志体系；</li>
+<li><a href="advanced/./upgrade-migration.html">升级与数据迁移</a>：v2→v3 迁移工具与 CI 红线。</li>
+</ul>
+<h2 id="阅读建议"><a class="header" href="#阅读建议">阅读建议</a></h2>
+<ul>
+<li>想为项目贡献代码：先读 MemoryCore 两章 + 部署形态中的 CI 一节（有一条关于 Skill 队列隔离的硬性红线）。</li>
+<li>想接入自研 Agent：SDK 章 + Adapter 章 + Proxy 章的注入块一节即可覆盖所需知识。</li>
+<li>想做生产运维：部署形态 + 可观测性 + 升级迁移三章是主线。</li>
+<li>所有章节的结论都尽量标注了源码路径，建议对照仓库阅读；本文基于 v2.0.1-beta.x 分支（<code>feat/server_team</code>），细节可能随版本演进。</li>
+</ul>
+<h2 id="贯穿全篇的四条设计主线"><a class="header" href="#贯穿全篇的四条设计主线">贯穿全篇的四条设计主线</a></h2>
+<p>提前把四条主线放在这里，读每一章时都可以回头对照：</p>
+<ol>
+<li><strong>双部署形态对称</strong>——<code>standalone | service</code> 是第一分叉，两态共享同一套业务逻辑，只是状态存放位置不同；</li>
+<li><strong>全链路降级而非崩溃</strong>——几乎每个可选依赖都有 fallback，故障体现为日志标签而非异常中断；</li>
+<li><strong>幂等与可追溯</strong>——upsert 写入、乐观锁更新、只追加审计、每次生成都留证据链；</li>
+<li><strong>缓存友好的上下文分层</strong>——稳定内容进 system prompt 尾部命中缓存，易变内容走工具或前置注入。</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="memorycore-内幕存储与网关"><a class="header" href="#memorycore-内幕存储与网关">MemoryCore 内幕：存储与网关</a></h1>
+<p>MemoryCore 是全系统的数据权威。本章从存储抽象讲到 Gateway 鉴权，覆盖阅读其源码所需的全部背景。</p>
+<h2 id="存储抽象一套接口两种后端"><a class="header" href="#存储抽象一套接口两种后端">存储抽象：一套接口，两种后端</a></h2>
+<p><code>src/core/store/</code> 下有一层存储工厂（<code>factory.ts</code>），按配置把记忆读写路由到不同实现：</p>
+<ul>
+<li><strong>SQLite 路径</strong>（默认，standalone）：单文件数据库。元数据与记录在常规表中；检索靠 <strong>FTS5</strong>（全文，配合 jieba 中文分词；jieba 缺失时退化为正则切词）+ <strong>sqlite-vec</strong>（向量余弦相似度）。sqlite-vec 加载失败时整个向量路降级为 no-op，只剩关键词召回。</li>
+<li><strong>TCVDB 路径</strong>（腾讯云向量数据库）：面向规模化部署。集合命名带实例前缀（如 <code>{db}_profiles</code>、<code>{db}_skills</code>）；最大优势是<strong>服务端原生混合检索</strong>——dense + sparse + RRFRerank 在一次 API 调用内完成（<code>tcvdb.ts:1027</code> 附近可见 <code>rerank: { method: "rrf", k: 60 }</code>），省去客户端融合。</li>
+</ul>
+<p>Embedding 是可选项：未配置 OpenAI-compatible Embedding API 时，系统纯 BM25 运行；配置后自动启用双路。</p>
+<p>管理面的元数据存储同样有双后端：SQLite 的 <code>meta_users / _user_keys / _teams / _team_members / _agents / _tasks / _task_agents / _participation_logs / _assets / _agent_fixed_assets / _asset_acl / _config_params</code> 系列表，或 MongoDB（<code>store/sqlite-adapter.ts</code> vs <code>mongodb-adapter.ts</code>，按 <code>{prefix}_{instance_id}</code> 隔离）。</p>
+<p>大对象（L2/L3 Markdown 产物、Skill 资源文件、生成日志）走文件系统或 COS offload，数据库里只登记元数据行。</p>
+<h2 id="三层鉴权"><a class="header" href="#三层鉴权">三层鉴权</a></h2>
+<p>Gateway（<code>src/gateway/server.ts</code>，Node 原生 http 服务，:8420）的请求要过三道身份检查，各自回答不同的问题：</p>
+<pre><code class="language-text">Authorization: Bearer &lt;apiKey&gt;        ← 第一层：调用方是否被允许访问这个 Gateway
+x-tdai-service-id: &lt;instance&gt;         ← 第二层：操作哪个 Memory 实例（数据隔离）
+x-tdai-user-key: &lt;sk-mem-...&gt;         ← 第三层（管理面）：代表哪个用户行事
+</code></pre>
+<p>第一层的 Bearer Key 由 <code>TDAI_GATEWAY_API_KEY</code> 配置；本地回环监听且未设置时可省略。第二层是强制的——所有业务请求都必须声明实例。第三层用于 <code>/v3/meta/*</code> 管理面，Gateway 会校验 user_key 并以解析出的用户身份做 owner/ACL 权威判定。</p>
+<h2 id="v2-与-v3两代-api-的关系"><a class="header" href="#v2-与-v3两代-api-的关系">v2 与 v3：两代 API 的关系</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>前缀</th><th>定位</th></tr></thead><tbody>
+<tr><td><code>/capture</code> <code>/recall</code> <code>/search/*</code></td><td>早期兼容接口，保留</td></tr>
+<tr><td>`/v2/conversation</td><td>atomic</td></tr>
+<tr><td>`/v3/conversation</td><td>atomic</td></tr>
+<tr><td><code>/v3/skill/*</code></td><td>Skill 管理/检索/版本/抽取</td></tr>
+<tr><td><code>/v3/meta/*</code></td><td>User/Team/Agent/Task/Asset/ACL 管理面</td></tr>
+<tr><td><code>/v3/knowledge/*</code></td><td>知识资产元数据登记</td></tr>
+<tr><td><code>/v3/memory-prompt/*</code>、<code>/v3/memory-generation-log/*</code></td><td>自定义 Prompt 与溯源</td></tr>
+</tbody></table>
+</div>
+<p>v3 的核心变化是把隔离从"可选习惯"升级为"协议强制"：L0/L1 写入必须带 <code>team_id + agent_id + user_id + session_id</code> 四元组（缺 session 报 422），L2/L3 至少三元组；参数可放请求体或对应的 <code>x-tdai-*</code> Header。SDK 层面同样体现为构造函数强制三元组（见 <a href="advanced/./sdk-guide.html">SDK 章</a>）。</p>
+<p>路由组织上，v2 在 <code>gateway/v2-router.ts</code>，v3 分散在各业务 handler（<code>chat-memory-handlers.ts</code>、<code>skill-handlers.ts</code> 等）+ <code>metadata/router/v3-meta-router.ts</code>。</p>
+<h2 id="双部署形态standalone-与-service"><a class="header" href="#双部署形态standalone-与-service">双部署形态：standalone 与 service</a></h2>
+<p>这是理解 MemoryCore 源码最重要的分叉。<code>deployMode</code> 决定一切有状态的东西放在哪：</p>
+<div class="table-wrapper"><table><thead><tr><th>维度</th><th>standalone</th><th>service</th></tr></thead><tbody>
+<tr><td>任务队列</td><td>进程内 Map + checkpoint 文件</td><td>Redis Stream</td></tr>
+<tr><td>定时器</td><td><code>setTimeout</code> / <code>setInterval</code></td><td>16 分片的 Timer ZSET（Lua 认领任务）</td></tr>
+<tr><td>并发控制</td><td>进程内信号量</td><td>分布式锁 <code>pipeline:{inst:tid:aid}[:s:sess]</code></td></tr>
+<tr><td>存储</td><td>本地 SQLite + 本地目录/COS</td><td>per-instance VDB/COS/MetadataService（按 <code>x-tdai-service-id</code> 动态解析）</td></tr>
+</tbody></table>
+</div>
+<p>关键代码：<code>utils/pipeline-manager.ts</code>（standalone）vs <code>utils/stateful-pipeline-manager.ts</code>（service），由 <code>pipeline-factory.ts</code> 组装。<strong>两态共享同一套 handler 和 executor</strong>——业务逻辑只写一遍，差异全部收敛在状态管理层。这就是为什么单机体验和生产扩展可以共用同一份代码。</p>
+<h2 id="幂等与可追溯的实现纪律"><a class="header" href="#幂等与可追溯的实现纪律">幂等与可追溯的实现纪律</a></h2>
+<p>翻源码时会反复遇到这几条纪律：</p>
+<ul>
+<li><strong>upsert 写入</strong>：所有记录按 <code>record_id</code> 幂等写入，重复提交不产生脏数据；</li>
+<li><strong>乐观锁</strong>：Skill 更新携带 <code>expected_version</code>，并发修改冲突直接报错而不是静默覆盖；</li>
+<li><strong>只追加审计</strong>：对记忆的修改写 <code>memory_audit</code> 表，不覆盖历史；</li>
+<li><strong>JSONL append 带 ETag/位置校验</strong>：对象存储上的追加写会先验证当前内容指纹。</li>
+</ul>
+<p>这些纪律共同保证了一个性质：任何一条记忆的当前状态，都可以沿着 Generation Log 与 Audit 记录还原出完整的来龙去脉。</p>
+<h2 id="配置系统"><a class="header" href="#配置系统">配置系统</a></h2>
+<p>Gateway 配置按优先级加载：<code>TDAI_GATEWAY_CONFIG</code> 指定的 YAML/JSON → 当前目录 → 数据目录 → 环境变量 → 内置默认值。YAML 支持 <code>${VAR}</code> 形式引用环境变量。常用模板三份：</p>
+<ul>
+<li><code>tdai-gateway.standalone.yaml</code>：最小单机 Memory 配置；</li>
+<li><code>tdai-gateway.yaml</code>：Standalone + Skill 默认配置；</li>
+<li><code>tdai-gateway.proxy.yaml</code>：经 OpenAI-compatible Proxy 调用模型。</li>
+</ul>
+<p>关键配置段（<code>src/config.ts</code>）：<code>pipeline.everyNConversations</code>（默认 5）、<code>recall.scoreThreshold</code>（默认 0.3）、<code>llm.*</code>（模型三件套）、<code>skill.*</code>（Skill 模块开关）。完整环境变量清单见附录<a href="advanced/../appendix/env-vars.html">环境变量速查</a>。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="生成管线与召回机制"><a class="header" href="#生成管线与召回机制">生成管线与召回机制</a></h1>
+<p>记忆系统有两个引擎：一个负责"长出来"（生成管线），一个负责"找回来"（召回）。本章深入两者的实现。</p>
+<h2 id="生成管线从-l0-到-l3"><a class="header" href="#生成管线从-l0-到-l3">生成管线：从 L0 到 L3</a></h2>
+<h3 id="调度结构"><a class="header" href="#调度结构">调度结构</a></h3>
+<pre><code class="language-text">L0 写入 ──► Timer Scanner ──► 任务队列 ──► Worker Permit Pool ──► Pipeline Worker
+   (services/timer-scanner.ts)              (worker-permit-pool.ts)   (pipeline-worker.ts)
+</code></pre>
+<ul>
+<li><strong>Scanner</strong> 周期扫描各会话的未处理轮数，判断是否达到触发条件；</li>
+<li><strong>队列</strong>在 standalone 模式是进程内 Map（checkpoint 到文件防重启丢失），service 模式是 Redis Stream；</li>
+<li><strong>Permit Pool</strong> 控制并发度，service 模式下配合分布式锁保证同一会话的任务不被多节点重复消费。</li>
+</ul>
+<h3 id="触发条件与预热"><a class="header" href="#触发条件与预热">触发条件与预热</a></h3>
+<p>触发由两个条件任一满足：</p>
+<ol>
+<li>会话新增轮数 ≥ 阈值。稳态阈值即 <code>pipeline.everyNConversations</code>（默认 5）；</li>
+<li>会话空闲超过 <code>l1IdleTimeoutSeconds</code>——避免"差一轮永远不跑"的尴尬。</li>
+</ol>
+<p>预热机制（<code>pipeline-manager.ts</code> 的 warm-up 逻辑）值得单独一提：新会话的阈值不是直接从 5 开始，而是 <strong>1 → 2 → 4 → 8 → … → N</strong> 翻倍爬升。效果是新用户的第 1 轮对话结束后就能看到第一条 L1 记忆，而不是对着空面板怀疑人生；随着交互加深，触发频率逐渐放缓到稳态，避免碎片化提炼。</p>
+<h3 id="各层的提炼实现"><a class="header" href="#各层的提炼实现">各层的提炼实现</a></h3>
+<p>每层有专属的 Prompt 模板与后处理（<code>src/core/prompts/</code>）：</p>
+<ul>
+<li><strong>L1 抽取</strong>（<code>l1-extraction.ts</code> + <code>l1-dedup.ts</code>）：LLM 从对话片段提取原子条目（事实/偏好/约束/事件），输出 JSON 协议；随后与既有 L1 做去重合并——语义等价的旧条目被更新而非重复创建。</li>
+<li><strong>L2 场景</strong>（<code>scene-extraction.ts</code>）：把相关 L1 归纳为 Scene Markdown 块，写入 <code>profiles/{scope}/scene_blocks/*.md</code>，数据库登记元数据（TCVDB 路径下 ID 为 <code>profile:v1:{sha256}</code>）。</li>
+<li><strong>L3 画像</strong>（<code>persona-generation.ts</code>）：跨场景沉淀稳定模式为 Persona 文档 <code>persona.md</code>。</li>
+</ul>
+<p>固定输出协议（L1 的 JSON 结构、L2/L3 的 Markdown 格式）不可被自定义 Prompt 篡改——自定义只能调整"关注什么"，不能改变"输出成什么样"。这是下游消费方（注入器、面板渲染）赖以工作的契约。</p>
+<p>每次生成的完整溯源（Prompt ID、版本、内容哈希、输入输出引用）写入 Generation Log，见<a href="advanced/./custom-prompt-lineage.html">专章</a>。</p>
+<h2 id="召回机制少拿但拿对"><a class="header" href="#召回机制少拿但拿对">召回机制：少拿但拿对</a></h2>
+<h3 id="混合检索的三种模式"><a class="header" href="#混合检索的三种模式">混合检索的三种模式</a></h3>
+<p>召回入口在 <code>src/core/hooks/auto-recall.ts</code> 与 <code>src/core/tools/memory-search.ts</code> / <code>conversation-search.ts</code>：</p>
+<ul>
+<li><strong>keyword</strong>：FTS5 BM25 全文检索；</li>
+<li><strong>embedding</strong>：向量相似度；</li>
+<li><strong>hybrid</strong>（默认）：双路并行检索，结果用 <strong>RRF（Reciprocal Rank Fusion）</strong> 融合。</li>
+</ul>
+<p>RRF 的实现非常克制（<code>RRF_K = 60</code>，取自原始论文的标准常数）：</p>
+<pre><code class="language-text">score(item) = Σ 1 / (k + rank_i + 1)
+</code></pre>
+<p>某条记录同时出现在关键词榜和向量榜时，两边的 RRF 分数累加——天然奖励"两种信号都认为相关"的结果。SQLite 路径下融合在客户端完成（先超额检索再合并）；TCVDB 路径则直接用服务端原生 hybridSearch 短路返回。</p>
+<h3 id="召回质量的护栏"><a class="header" href="#召回质量的护栏">召回质量的护栏</a></h3>
+<p>原始相似度之外还有多层过滤：</p>
+<ul>
+<li><strong>分数阈值</strong>：<code>recall.scoreThreshold</code>（默认 0.3）以下的结果丢弃；</li>
+<li><strong>条数上限</strong>：限制返回条目数；</li>
+<li><strong>字符预算</strong>：格式化后的总长度受限，防止记忆占满上下文；</li>
+<li><strong>超时</strong>：召回整体有超时控制，慢查询宁可返回空也不阻塞主链路。</li>
+</ul>
+<p>错误也是分级的：Embedding 未配置这类情况以结构化 <code>RecallError</code>（code 20001 等）返回，调用方可感知地降级，而不是抛异常。</p>
+<h3 id="缓存友好的上下文拆分"><a class="header" href="#缓存友好的上下文拆分">缓存友好的上下文拆分</a></h3>
+<p>auto-recall 里有一处明确注释的性能设计（H-15 系列），值得所有做 LLM 应用的人学习。召回结果被拆进两个通道：</p>
+<ul>
+<li><strong><code>appendSystemContext</code></strong>：persona、场景导航、工具使用指南——这些内容<strong>跨轮稳定</strong>，追加到 system prompt 尾部，可以命中上游 provider 的 prompt cache；</li>
+<li><strong><code>prependContext</code></strong>：本轮查询命中的 L1 相关记忆——<strong>每轮变化</strong>，前置到 user prompt，不污染缓存前缀。</li>
+</ul>
+<p>顺序很重要：稳定的在前、易变的在后（对 system prompt 而言），才能让缓存前缀尽量长。Proxy 的注入管线遵循同一哲学（见 <a href="advanced/./proxy-internals.html">Proxy 内幕</a>）。</p>
+<h2 id="skill-子系统速写"><a class="header" href="#skill-子系统速写">Skill 子系统速写</a></h2>
+<p>Skill 是数据面里最复杂的业务对象，几个要点：</p>
+<ul>
+<li><strong>存储</strong>：SQLite 路径用 vectors.db 的 <code>skills / skill_fts / skill_vec</code> 三表（BM25 + 向量）；资源文件按 <code>&lt;skill_id&gt;/v&lt;version&gt;/files/</code> 组织；TCVDB 路径用 <code>{db}_skills</code> 集合；</li>
+<li><strong>版本化</strong>：<code>skill-versioning.ts</code> 维护版本链，更新走 <code>expected_version</code> 乐观锁；</li>
+<li><strong>抽取</strong>：对话经 <code>/v3/skill/conversation/add</code> 进入缓冲区（COS 上按 <code>{space}/{user}/{team}/{agent}/{session}/</code> 组织），后台判定是否值得归档；另有 fast-path 处理显式触发的 <code>mem:create-skill</code>；</li>
+<li><strong>降级</strong>：向量路不可用时检索自动回退 BM25 并记录 <code>SkillDegradation</code> 事件，契约层面保证 mode 不被静默吞掉；</li>
+<li><strong>隔离</strong>：CI 对这个模块有一条硬性红线——禁止引入直接 fs import、禁止触碰 pipeline-worker/integrations/redis（见<a href="advanced/./upgrade-migration.html">升级与迁移</a>章的 CI 一节）。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="自定义-prompt-与生成溯源"><a class="header" href="#自定义-prompt-与生成溯源">自定义 Prompt 与生成溯源</a></h1>
+<p>自动抽取的记忆不可能永远符合你的团队语境。MemoryCore 提供了两个配套机制：<strong>自定义 Memory Prompt</strong>（调整提炼的关注点）与 <strong>Generation Log</strong>（追溯每条记忆是怎么来的）。两者合起来，把记忆从"系统产出的黑盒"变成"可调校、可审计的资产"。</p>
+<h2 id="自定义-prompt-的能力边界"><a class="header" href="#自定义-prompt-的能力边界">自定义 Prompt 的能力边界</a></h2>
+<p>先说清它<strong>能改什么、不能改什么</strong>：</p>
+<ul>
+<li>✅ 调整 L1/L2/L3 提炼时的关注点与归纳策略，例如"重点提取架构决策、兼容性约束、风险和可复用方法"；</li>
+<li>❌ 不能修改固定输出协议——L1 的 JSON 结构、L2 Scene Markdown 和 L3 Persona/Doctrine 的格式是硬契约。</li>
+</ul>
+<p>配额限制：每个 Memory Instance 最多 500 个自定义 Prompt；单个 Prompt 内容最长 10,000 个 Unicode 字符。</p>
+<h2 id="绑定模型与优先级"><a class="header" href="#绑定模型与优先级">绑定模型与优先级</a></h2>
+<p>Prompt 本体和目标绑定分开存储。绑定目标有三层，解析时按优先级生效：</p>
+<pre><code class="language-text">Agent &gt; Team &gt; Instance &gt; 系统内置
+</code></pre>
+<ul>
+<li>Agent 由 <code>team_id + agent_id</code> 唯一确定；</li>
+<li>未命中任何自定义 Prompt 时完全使用系统默认；</li>
+<li>命中时只<strong>追加</strong>客户的记忆策略（不是替换系统 Prompt）；</li>
+<li>删除 Prompt 会清理相关绑定，运行时自动回退到下一级。</li>
+</ul>
+<p>版本语义：更新保持 <code>memory_prompt_id</code> 不变并执行 <code>version += 1</code>，已有绑定的新生成任务自动使用最新版本——正在跑的旧任务不受影响。</p>
+<h2 id="主要接口"><a class="header" href="#主要接口">主要接口</a></h2>
+<pre><code class="language-text">POST /v3/memory-prompt/create     # 创建
+GET  /v3/memory-prompt/get       # 查询
+POST /v3/memory-prompt/update    # 更新（version+1）
+POST /v3/memory-prompt/delete    # 删除（清理绑定）
+POST /v3/memory-prompt/set       # 绑定到 Agent/Team/Instance
+GET  /v3/memory-prompt/log       # 设置操作日志
+GET  /v3/memory-generation-log/list | /get   # 生成溯源
+</code></pre>
+<p>创建示例：</p>
+<pre><code class="language-bash">curl -sS -X POST http://127.0.0.1:8420/v3/memory-prompt/create \
+  -H "Authorization: Bearer ${TDAI_GATEWAY_API_KEY}" \
+  -H "x-tdai-service-id: local-memory" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "architecture-decisions",
+    "layer": "l1",
+    "prompt": "重点提取架构决策、兼容性约束、风险和可复用方法。"
+  }'
+</code></pre>
+<blockquote>
+<p>本地未配置 <code>TDAI_GATEWAY_API_KEY</code> 且只监听回环地址时可省略 <code>Authorization</code>；<code>x-tdai-service-id</code> 始终必填。</p>
+</blockquote>
+<h2 id="generation-log证据链设计"><a class="header" href="#generation-log证据链设计">Generation Log：证据链设计</a></h2>
+<p>每次 L1/L2/L3 生成都会落一条溯源记录，回答三个问题：</p>
+<ol>
+<li><strong>用了哪个 Prompt？</strong> 记录 <code>memory_prompt_id</code>、版本、来源（自定义/内置）以及内容的 <strong>SHA-256 哈希</strong>——注意不保存 Prompt 正文快照，既省空间又避免正文里的敏感信息扩散。</li>
+<li><strong>输入是什么？</strong> 本次生成引用了哪些 L0/L1 记录。</li>
+<li><strong>输出了什么？</strong> 生成的 Memory ID 与结果的存储位置。</li>
+</ol>
+<p>实现上分两层：数据库表 <code>memory_generation_refs</code> 做反向索引（"这条记忆由哪个 prompt 版本生成"），完整日志对象写 COS 或本地目录，对象键形如：</p>
+<pre><code class="language-text">memory-generation-logs/v1/layer={l}/date={d}/hour={h}/{倒序ts}__mid={anchor}__lid={logId}.json
+</code></pre>
+<p>倒序时间戳的设计让按时间"新到旧列举"变成一次字典序扫描。按 Memory ID 查询：</p>
+<pre><code class="language-bash">curl -sS -G http://127.0.0.1:8420/v3/memory-generation-log/get \
+  -H "Authorization: Bearer ${TDAI_GATEWAY_API_KEY}" \
+  -H "x-tdai-service-id: local-memory" \
+  --data-urlencode "memory_id=&lt;memory-id&gt;" \
+  --data-urlencode "layer=l1"
+</code></pre>
+<h2 id="实操建议"><a class="header" href="#实操建议">实操建议</a></h2>
+<p>一个经过验证的调校流程：</p>
+<ol>
+<li>先观察默认 Prompt 的产出：面板里看 L1 条目是否抓对了重点；</li>
+<li>针对系统性偏差写自定义 Prompt——比如发现它总是忽略性能约束，就加一句"特别关注性能相关约束与权衡"；</li>
+<li>绑定到 Team 层（而非逐 Agent 配置），让整个团队共享同一套提炼口径；</li>
+<li>用 <code>/v3/memory-generation-log/get</code> 对比调校前后同一对话的产出差异；</li>
+<li>E2E 验证可跑 <code>npm run e2e:memory-prompt:vdb-cos</code>——它会验证 Agent/Team/Instance 三层 Prompt 的实际模型请求、持久化与 COS 日志，并用唯一测试 ID 清理数据。</li>
+</ol>
+<p>SDK 侧：TypeScript 导出 <code>MemoryPromptClient</code> 与 <code>MemoryGenerationLogClient</code>，Python SDK 提供同步/异步双版本，方法一一对应。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="memoryproxy-内幕注入管线与会话初始化"><a class="header" href="#memoryproxy-内幕注入管线与会话初始化">MemoryProxy 内幕：注入管线与会话初始化</a></h1>
+<p>Proxy 是四个组件里对延迟最敏感的——它卡在每一次 LLM 调用的关键路径上。因此它的所有设计都围绕两个目标：<strong>注入要快且不破坏缓存</strong>，<strong>故障要不阻断转发</strong>。</p>
+<h2 id="请求处理八阶段"><a class="header" href="#请求处理八阶段">请求处理八阶段</a></h2>
+<p>一次带 <code>spaceId</code> 的主模型调用经过：</p>
+<pre><code class="language-text">POST /proxy/&lt;spaceId&gt;/v1/chat/completions | /v1/messages
+   ├─ 1. auth ─────── 校验 x-tdai-user-key，解析出 user_id
+   ├─ 2. systemUser ─ 命中内部账号则短路透传
+   ├─ 3. sessionInit ─ 首次对话弹表单：team → agent → task
+   ├─ 4. injection ── system prompt 注入 skill / knowledge / memory
+   ├─ 5. rateLimit ── spaceId × 最终模型 TPM/QPM 限流
+   ├─ 6. forward ──── 转发到上游 LLM
+   ├─ 7. extract ──── 一轮结束后异步回流 conversation + L0
+   └─ 8. report ───── ClickHouse / Langfuse / Opik / Credit 上报
+</code></pre>
+<p>源码入口在 <code>src/index.ts</code> → <code>server.ts</code>，按协议分流到 <code>handler.ts</code>（OpenAI）、<code>anthropicHandler.ts</code>（Anthropic Messages）、<code>codexHandler.ts</code>（Responses）等。<strong>系统用户短路透传</strong>是第一阶段的重要出口：内部服务账号（如 Knowledge Service 用专用记账用户调 LLM）命中后跳过 session init 和注入，只做透明转发 + 计费——否则 Wiki 生成的请求也会被弹表单。</p>
+<h2 id="会话初始化多客户端的状态机"><a class="header" href="#会话初始化多客户端的状态机">会话初始化：多客户端的状态机</a></h2>
+<p>sessionInit 要解决的问题是"把无状态的 HTTP 会话绑到 team/agent/task 三元组"，而难点在于每个客户端的交互能力不同。源码 <code>src/session/</code> 下按客户端分子模块（claude-code/codebuddy/codex/dsh/workbuddy），各自实现一套适配：</p>
+<ul>
+<li><strong>Claude Code</strong>：借 CC 原生 <code>AskUserQuestion</code> 工具返回三连问；</li>
+<li><strong>CodeBuddy/WorkBuddy</strong>：各自的追问工具；</li>
+<li><strong>Codex</strong>：伪 function_call 表单（所以必须先切 Plan 模式，否则 agent 模式会自动执行掉）；</li>
+<li><strong>dsh</strong>：原生 <code>ask_user_question</code> tool call，渲染为 Web UI 按钮；CLI headless 自动 bypass；</li>
+<li><strong>Hermes/OpenClaw</strong>：不交互——<code>x-team-id/x-agent-id/x-task-id/x-conversation-id</code> 四 header 齐全时直接注册，缺了才尝试表单并最终 bypass。</li>
+</ul>
+<p>状态存储在 ProxyStorage 中，key 按 <code>{spaceId}/{userId}/{agentSource}/{sessionId}</code> 组织。<code>headerAutoSelect.onMismatch: "form"</code> 等配置控制 header 与已有状态冲突时的行为。可选的 <code>sessionInit.defaultTaskId</code> 能在每个 team 的 Task 列表头部插入虚拟项"本次不关联任务"，解决"没建过 Task 卡流程"的问题。</p>
+<h2 id="注入管线内容块与缓存哲学"><a class="header" href="#注入管线内容块与缓存哲学">注入管线：内容块与缓存哲学</a></h2>
+<p>注入器（<code>src/injection/injectors/</code>）产出这些 system prompt 块：</p>
+<div class="table-wrapper"><table><thead><tr><th>块</th><th>来源</th><th>内容</th></tr></thead><tbody>
+<tr><td><code>&lt;tdai_profile_memory&gt;</code></td><td>Core L2/L3</td><td>Agent Profile 场景块 + Team/Global 记忆</td></tr>
+<tr><td><code>&lt;cloud_skills&gt;</code></td><td>Core Skill RAG</td><td>与当前问题相关的 Skill 摘要</td></tr>
+<tr><td><code>&lt;skill_tools&gt;</code></td><td>Skill Bridge</td><td>如何通过 curl 调用 Skill 工具的说明</td></tr>
+<tr><td><code>&lt;knowledge_tools&gt;</code></td><td>KS</td><td>绑定的 Wiki/CodeGraph 两步自发现协议</td></tr>
+<tr><td><code>&lt;session_context&gt;</code></td><td>session 状态</td><td>本次绑定的 agent/task 信息</td></tr>
+<tr><td><code>&lt;asset_reflection&gt;</code></td><td>（可选）</td><td><code>/analyse</code> marker 开启时的复盘指令</td></tr>
+</tbody></table>
+</div>
+<p>而 <strong>L0/L1 刻意不内联注入</strong>——它们通过 <code>&lt;tdai_memory_tools&gt;</code> 以只读工具形式暴露给模型主动查询。原因在前文反复出现：L0/L1 每轮变化，内联会击穿上游 KV cache；L2/L3 和工具说明相对静态，可以稳定占据 system prompt 尾部命中缓存。多节点部署时还必须配置 <code>injection.externalGatewayUrl</code> 并统一用 COS 后端，否则各实例缓存不一致同样导致 cache miss。</p>
+<p><strong>失败哲学</strong>：任何注入器失败都非致命——回退原始 body 继续转发，绝不让记忆系统的故障变成用户对话的故障。上报同理（三路可观测互相独立、error-silent），限流则 fail-open。</p>
+<h2 id="存储抽象与降级链"><a class="header" href="#存储抽象与降级链">存储抽象与降级链</a></h2>
+<p><code>src/storage/</code> 实现了 ProxyStorage 统一抽象，承载三类状态（<code>inj:*</code> 注入缓存、<code>sk:*</code> Skill 状态、<code>vpin:*</code> 版本 pin）。Key 布局：</p>
+<pre><code class="language-text">proxy_cache/{ttl|nottl}/{spaceId}/{userId}/{agentSource}/{sessionId}/...
+</code></pre>
+<p><code>ttl/</code> 只放热缓存（可重建），<code>nottl/</code> 放 binding 等必须持久化的业务态。四种后端的选型：</p>
+<div class="table-wrapper"><table><thead><tr><th>后端</th><th>场景</th></tr></thead><tbody>
+<tr><td><code>cos</code></td><td>生产多实例部署（跨节点共享，仅 kernel-sts 凭证）</td></tr>
+<tr><td><code>sqlite</code></td><td>单实例本地开发/CI（内置 sweeper 定期清 ttl 桶）</td></tr>
+<tr><td><code>fs</code></td><td>离线/docker 兜底（交给外部 tmpwatch）</td></tr>
+<tr><td><code>memory</code></td><td>测试兜底（重启即失）</td></tr>
+</tbody></table>
+</div>
+<p>降级链 <code>cos → sqlite → fs → memory</code>，任一 init 失败自动降级；<code>/health</code> 暴露 <code>storage.effective</code> 作为观测锚点。</p>
+<h2 id="限流与计费"><a class="header" href="#限流与计费">限流与计费</a></h2>
+<ul>
+<li><strong>Input TPM/QPM</strong>：按 <code>spaceId × 最终模型</code> 在 Redis 上做 60 秒滑动窗口；<code>GET/PUT/DELETE /v3/admin/rate-limits</code> 动态调整；</li>
+<li><strong>Credit 计费</strong>：上游响应完成后按定价表（<code>pricing.ts</code>）计算 CreditDelta 上报计费服务，仅识别路径带 <code>/proxy/&lt;spaceId&gt;/</code> 的请求；</li>
+<li><strong>用量明细</strong>：JSONL 结构化日志 + ClickHouse 按 turn 记录 token 明细。</li>
+</ul>
+<h2 id="其他值得知道的机制"><a class="header" href="#其他值得知道的机制">其他值得知道的机制</a></h2>
+<ul>
+<li><strong>mem: 指令拦截</strong>：见<a href="advanced/./mem-commands.html">专章</a>；</li>
+<li><strong>Skill/Memory Bridge</strong>：<code>/skill-bridge/**</code> 与 <code>/memory-bridge/**</code> 反向代理 Core 的 HTTP 工具，转发时注入 serviceToken——避免凭据出现在 LLM 可见的 prompt 里；</li>
+<li><strong>按 agent name 的上游覆盖</strong>：<code>upstream.agents</code> 允许特定客户端走不同的上游（例如 claude-code 单独走 CCR）；</li>
+<li><strong>gateway/ 一致性哈希网关</strong>：可选的多实例负载均衡层，按 keyId 做一致性哈希保证同一用户落在同一 proxy 实例（配合 COS 后端）；</li>
+<li><strong><code>/analyse</code> marker</strong>：URL 带 <code>/analyse/</code> 段时（双闸门：配置 <code>injection.assetReflection.markerOptIn=true</code> 且 URL 显式携带），system prompt 末尾追加资产反思块，让 LLM 在回答末尾逐工具自评"这次注入值不值"。定位是效果评估，不建议对线上流量默认打开。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="mem-会话指令"><a class="header" href="#mem-会话指令"><code>mem:</code> 会话指令</a></h1>
+<p><code>mem:</code> 指令是 Proxy 提供的最轻量的记忆操作入口：在对话里直接输入 <code>mem:</code> 开头的指令，Proxy 会拦截并就地处理——不用离开当前会话去开面板，也不用记 API。</p>
+<h2 id="现有指令"><a class="header" href="#现有指令">现有指令</a></h2>
+<p>随 v2.0.0 发布，当前共三个：</p>
+<div class="table-wrapper"><table><thead><tr><th>指令</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>mem:sync</code></td><td>刷新本次会话的全部资产注入（Skill / 记忆 / Knowledge / Task &amp; Agent 描述）</td></tr>
+<tr><td><code>mem:create-skill [提示词]</code></td><td>把本次对话归档为 Skill，后台异步提取</td></tr>
+<tr><td><code>mem:help</code></td><td>显示指令帮助</td></tr>
+</tbody></table>
+</div>
+<p>格式约定：<code>mem:&lt;command&gt;</code>，冒号后不加空格，命令名大小写不敏感。</p>
+<h2 id="典型使用场景"><a class="header" href="#典型使用场景">典型使用场景</a></h2>
+<p><strong><code>mem:sync</code></strong> —— 你刚在面板上给当前 Agent 新绑了一个 Wiki 或改了 system prompt，但会话已经开了很久。输入 <code>mem:sync</code>，Proxy 重新拉取全部资产并刷新注入内容，无需重开会话。</p>
+<p><strong><code>mem:create-skill</code></strong> —— 刚和 agent 一起搞定了一次复杂的线上排障。输入 <code>mem:create-skill</code>，对话被归档进 Skill 抽取缓冲区，后台 LLM 异步提炼出带版本、步骤和验证规则的候选 Skill；稍后在面板审核发布。可选提示词可以引导抽取重点。</p>
+<p><strong><code>mem:help</code></strong> —— 除了查看用法，它还有一个隐藏价值：<strong>验证注入链路是否正常</strong>。如果 <code>mem:help</code> 没有响应，说明请求根本没经过 Proxy 的指令拦截层——通常是 base URL 配错或 session 未初始化。</p>
+<h2 id="实现机制"><a class="header" href="#实现机制">实现机制</a></h2>
+<p>拦截发生在 Proxy 的请求预处理阶段（源码 <code>src/mem-command/</code>）：检测到用户消息以 <code>mem:</code> 开头时，Proxy 不把该消息转发给上游 LLM，而是就地生成响应返回。这意味着：</p>
+<ul>
+<li>指令消耗零 token；</li>
+<li>响应速度与上游模型无关；</li>
+<li>对客户端完全透明——任何走 Proxy 的客户端都能用，无论 CC、CodeBuddy 还是 Codex。</li>
+</ul>
+<p><code>session init</code> 完成是使用指令的前提：未绑定 team/agent/task 的会话中，涉及资产的指令没有作用对象。</p>
+<h2 id="路线图上的扩展"><a class="header" href="#路线图上的扩展">路线图上的扩展</a></h2>
+<p>v2.0.1 计划把指令能力扩展到 Task 维度：</p>
+<ul>
+<li>在对话里直接<strong>创建 Task</strong>、<strong>更新 Task</strong>；</li>
+<li>Task 与记忆资产的关联在会话内即时生效。</li>
+</ul>
+<p>动机很实际："Task 是记忆归属的组织方式。能在对话里就地维护它，才不会出现『事情做完了，Task 还停在三天前的描述』。"</p>
+<p>官方同时明确表示：接下来做哪些指令取决于真实使用中的需求——你在实际场景里反复需要什么操作（查看当前注入了什么？临时禁用某个资产？把某段对话存成记忆？），欢迎到 Issues 描述<strong>使用场景</strong>（比接口设计更有价值）。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="memoryknowledge-内幕wiki-引擎与-codegraph"><a class="header" href="#memoryknowledge-内幕wiki-引擎与-codegraph">MemoryKnowledge 内幕：Wiki 引擎与 CodeGraph</a></h1>
+<p>Knowledge Service（KS）负责把"文档和代码"变成 Agent 可用的记忆。它基于 Hono，默认端口 8421，API 前缀 <code>/v3</code>。</p>
+<h2 id="wiki-引擎ingest-流水线"><a class="header" href="#wiki-引擎ingest-流水线">Wiki 引擎：ingest 流水线</a></h2>
+<p>一次 Wiki ingest 的完整旅程：</p>
+<pre><code class="language-text">上传/拉取文档 ──► realWikiWorker ──► LLM 逐页抽取结构化页面
+                                        │
+                          mergePage 合并去重（单页失败不影响其他页）
+                                        ▼
+              每 wiki 独立的 index.db（FTS5 全文 + 链接图谱）
+</code></pre>
+<p>几个关键实现细节：</p>
+<ul>
+<li><strong>每 wiki 独立 index.db</strong>：不是一个大库。读取走 LRU 池复用连接，写入用独立事务连接——单个 wiki 的构建不会拖累其他 wiki 的查询。</li>
+<li><strong>mergePage</strong>：新抽取的页面与已有页面做 LLM 辅助合并决策（更新、新建或跳过），重复 ingest 同一批文档不会产生重复页面。</li>
+<li><strong>run_id 代际机制</strong>：每次 ingest 有唯一 run_id，进度回调和终态回调都携带它——Panel 用它拒绝 clear 操作之后的迟到包，避免旧任务的进度污染新状态。</li>
+<li><strong>自动摘要</strong>：构建完成时生成 wiki 摘要（LLM 生成）随终态回调返回，Panel 直接展示。</li>
+</ul>
+<h2 id="codegraph代码的图索引"><a class="header" href="#codegraph代码的图索引">CodeGraph：代码的图索引</a></h2>
+<pre><code class="language-text">git clone ──► CodeGraph 索引（符号/文件树/调用关系）──► 探索查询
+</code></pre>
+<p>KS 通过 bridge 调用 CodeGraph 引擎（该项目复用了开源项目 <a href="https://github.com/colbymchenry/codegraph">colbymchenry/codegraph</a> 的实现）。对外暴露八类查询：</p>
+<p><code>code_search / explore / callers / callees / impact / node / status / files</code></p>
+<p>其中 <code>impact</code> 是最有价值的一个：改代码前先查影响路径，这是文本检索永远给不了的能力。</p>
+<h3 id="auto-sync-调度器"><a class="header" href="#auto-sync-调度器">Auto-Sync 调度器</a></h3>
+<p>可选功能（<code>KNOWLEDGE_AUTO_SYNC_ENABLED=true</code> 显式开启），实现在 <code>src/store/auto-sync-scheduler.ts</code>：</p>
+<ul>
+<li><strong>FIFO 内存队列 + 定长常驻 worker pool</strong>；worker 数 <code>KNOWLEDGE_AUTO_SYNC_MAX_CONCURRENT</code> 默认 3（clamp 1–20），扫描周期默认 10 分钟（clamp 1–60）；</li>
+<li>启动后延迟 30 秒首扫（让启动恢复流程先完成，避免抢磁盘）；</li>
+<li>只扫 <code>status=ready</code> 的 code-graph；<code>inFlight Set</code> 去重防重复入队；</li>
+<li>worker 循环取队列执行同步，异常一律吞掉保证不死；同步中的仓库再次入队会得到 <code>busy</code>（对应 HTTP 409）。</li>
+</ul>
+<h2 id="tools-协议agent-如何发现并调用知识"><a class="header" href="#tools-协议agent-如何发现并调用知识">Tools 协议：Agent 如何发现并调用知识</a></h2>
+<p>KS 的核心创新点之一是把知识查询做成<strong>自发现协议</strong>：</p>
+<pre><code class="language-text">POST /v3/tools/list   → 返回可用工具清单（名称/描述/参数 schema）
+POST /v3/tools/call   → 执行具体工具调用
+</code></pre>
+<p>Proxy 把这个协议渲染进 <code>&lt;knowledge_tools&gt;</code> 注入块：模型先 list 发现自己有哪些知识工具，再按需 call 读取相关页面、源码或影响路径。这就是"知识不整库注入，而是按需调用"的落地形态——平时知识只是可用的工具，真正需要时才进入上下文。</p>
+<h2 id="llm_binding谁为-wiki-生成的-token-买单"><a class="header" href="#llm_binding谁为-wiki-生成的-token-买单">llm_binding：谁为 Wiki 生成的 token 买单</a></h2>
+<p>Wiki 抽取要烧 LLM token，这笔账必须算清楚。KS 用一张小表（<code>store/llm-binding-store.ts</code>）按 service_id 记录 LLM 绑定：</p>
+<div class="table-wrapper"><table><thead><tr><th>绑定状态</th><th>生效配置</th></tr></thead><tbody>
+<tr><td><code>proxy</code> 且配置齐全</td><td><code>{proxy_base_url}/proxy/{service_id}/v1</code> —— 走 Proxy 以专用 knowledge-service 记账用户计费</td></tr>
+<tr><td><code>byo</code> 且配置齐全</td><td>用户自带 OpenAI 兼容端点直连</td></tr>
+<tr><td>无绑定/缺参</td><td>由全局 <code>LLM_MODE</code> 决定；proxy 模式下<strong>刻意抛错而非静默直连</strong></td></tr>
+</tbody></table>
+</div>
+<p>最后一条是刻意的工程决策：宁可启动失败也不静默兜底，强制 proxy 绑定链路被真正验证而不是掩盖 bug。另一个细节：binding 只覆写 endpoint/key，<strong>model 永远来自全局 <code>LLM_MODEL</code></strong>——单一真相源，不存 per-instance model。</p>
+<p>控制面接口在 <code>/v3/internal/llm-binding/*</code>（set/status/list），幂等 upsert——重发即覆写，这就是 Panel 启动时推送绑定的重绑机制。永不回显 api_key。</p>
+<h2 id="与-panel-的回调协作"><a class="header" href="#与-panel-的回调协作">与 Panel 的回调协作</a></h2>
+<pre><code class="language-text">ingest_progress（流式）──► Panel /api/v1/knowledge/status-callback
+status ready/failed（终态）──► 同上（含 auto summary + sync_error + run_id）
+</code></pre>
+<p>进度回调 fire-and-forget 且节流；终态失败重试 1 次（间隔 1s，5s 超时）后放弃，绝不阻塞主任务；<code>TMC_CALLBACK_URL</code> 为空则整体 no-op。Panel 收到 ready 后写内核资产明细并以 stash 的 owner 身份登记 meta_asset。</p>
+<h2 id="mcp-stdio-通道"><a class="header" href="#mcp-stdio-通道">MCP stdio 通道</a></h2>
+<p>对支持 MCP 的宿主，KS 提供等价的 stdio 入口（<code>bin/mcp.mjs</code> → <code>dist/mcp/server.js</code>）。它是纯协议翻译层：<code>ListTools</code> 返回静态注册的 12 个工具（code-graph 8 个 + wiki 4 个），<code>CallTool</code> 按工具声明的 endpoint POST 回本机 HTTP API。管理操作刻意不暴露为 MCP 工具。</p>
+<h2 id="可选埋点"><a class="header" href="#可选埋点">可选埋点</a></h2>
+<ul>
+<li><strong>ClickHouse 工具调用日志</strong>（<code>KNOWLEDGE_CLICKHOUSE_ENABLED=true</code>）：<code>POST /v3/tools/call</code> 写入 <code>tool_call_logs</code> 表，请求正文递归脱敏并截断到 512 bytes；建表/批写失败均不阻断业务；</li>
+<li><strong>Langfuse</strong>：配 <code>LANGFUSE_PUBLIC_KEY/SECRET_KEY</code> 后上报 Wiki LLM 调用 trace；未配置时整体关闭。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="memorypanel-内幕管控面架构"><a class="header" href="#memorypanel-内幕管控面架构">MemoryPanel 内幕：管控面架构</a></h1>
+<p>Panel 的自我定位非常克制：<strong>无状态的控制台</strong>——不保存服务端登录会话、不维护本地用户库，业务数据全部由外部服务持久化。它做的只有三件事：校验调用方凭证并转发授权请求、聚合多源元数据、管理资产分配与绑定。</p>
+<h2 id="六边形架构kernel-端口与适配器"><a class="header" href="#六边形架构kernel-端口与适配器">六边形架构：kernel 端口与适配器</a></h2>
+<p>后端按六边形（端口-适配器）组织，<code>src/panel/</code> 下：</p>
+<pre><code class="language-text">config/    配置加载 + 实例注册表
+domain/    领域类型与规则（entities / chat-memory-governance / asset-id）
+http/      Hono 应用、中间件、路由（对外 API 面）
+kernel/
+  ports/     KernelHttpPort · MetaKernelPort · SkillKernelPort · KnowledgeClientPort
+  adapters/  fetch-* 实现：组装凭证头、日志脱敏、超时映射
+startup/   启动任务（如 ensure-knowledge-llm-binding）
+state/     内存态（knowledge 任务表、ingest 进度）
+</code></pre>
+<p><code>FetchKernelHttpAdapter</code> 是理解 Panel 行为的关键：</p>
+<ul>
+<li>组装 <code>Authorization: Bearer &lt;api_key&gt;</code> + <code>x-tdai-service-id</code> + 可选 <code>x-tdai-user-key</code> + <code>x-request-id</code>；</li>
+<li><strong>日志脱敏</strong>：password/api_key/token/user_key 等敏感字段打码，字段截断 300 字符、JSON 截断 1200 字符；</li>
+<li>AbortController 超时 15s，超时映射 504、网络错映射 502，统一包装为 <code>KERNEL_TIMEOUT/KERNEL_UNAVAILABLE</code> 信封。</li>
+</ul>
+<p>凭证上下文每次请求由中间件从 Header + 注册表拼出 <code>MetaCallContext</code>。Panel 自己不做权限判定，而是把 caller 的 user_key 原样透传给内核——<strong>内核才是权威的权限裁判</strong>。</p>
+<h2 id="实例注册表"><a class="header" href="#实例注册表">实例注册表</a></h2>
+<p><code>config/metadata-instances.json</code>（gitignore，仓库只留 example）描述 Panel 可连接的 Memory 实例：</p>
+<div class="table-wrapper"><table><thead><tr><th>字段</th><th>必填</th><th>含义</th></tr></thead><tbody>
+<tr><td><code>id</code></td><td>是</td><td>= <code>x-tdai-service-id</code>；本地常用 <code>default</code></td></tr>
+<tr><td><code>name</code></td><td>是</td><td>登录页展示名（唯一对外暴露的字段）</td></tr>
+<tr><td><code>gateway_endpoint</code></td><td>是</td><td>Panel → 内核转发地址，<strong>不能指 Proxy</strong></td></tr>
+<tr><td><code>proxy_endpoint</code></td><td>否</td><td>仅用于 UI 展示客户端接入地址卡片</td></tr>
+<tr><td><code>api_key</code></td><td>是</td><td>Gateway Bearer，仅服务端使用，绝不下发浏览器</td></tr>
+</tbody></table>
+</div>
+<p>zod schema 校验在 <code>src/panel/config/instance-registry.ts</code>；未命中的实例 ID 返回 400 <code>INVALID_INSTANCE</code>。</p>
+<h2 id="api-面白名单代理--聚合路由"><a class="header" href="#api-面白名单代理--聚合路由">API 面：白名单代理 + 聚合路由</a></h2>
+<p>公开入口统一 <code>/api/v1</code>，全部 POST，响应统一信封 <code>{code, message, request_id, data}</code>：</p>
+<p><strong>元数据代理</strong>（<code>routes/meta/proxy.ts</code>）：把 <code>POST /meta/{action}</code> 转发到内核 <code>/v3/meta/{action}</code>，但只放行白名单里的 55 条 action。附加了三层业务逻辑：create 类 action 先查重（重复名返回中文 409）；<code>team-member/add</code> 成功后异步给默认 Agent 导入预置 Skill（冷启动优化）；user/list 过滤隐藏内部记账用户 <code>knowledge-service</code>。</p>
+<p><strong>Chat Memory 聚合路由</strong>（<code>routes/chat-memory.ts</code>，约 2000 行，全项目最复杂的单文件）：围绕"团队资产/固定资产/我的资产"三视图提供 team-assets、agent-fixed、mine、allocate、set-agent-fixed、unbind、layer（L0-L3 分层懒加载，分别调数据面四层接口，支持 before_ts 游标分页）、import（历史对话导入）、search 等。读权限由 <code>authorizeChatMemoryRead</code> 统一：owner ∨ team 共享且是成员 ∨ 借入方。</p>
+<p><strong>消除 N+1 的专用端点</strong>：<code>task/list-with-agents</code>（一次 task 列表 + 分批并行 task-agent 查询）、<code>agent-overview/bootstrap</code>（Agent 编辑弹窗一次拉齐四类资产池 + skill 归属统计）——都是为前端体验专门设计的批量接口。</p>
+<p><strong>Knowledge 工坊路由</strong>：wiki/code-graph 的 list/create/ingest/delete/search/graph 等透传 KS；create 时幂等登记 meta_asset；<code>status-callback</code> 接收 KS 的 S2S 回调（不挂浏览器 header 校验），ready 时写资产明细、failed 不写。</p>
+<h2 id="角色模型的实现细节"><a class="header" href="#角色模型的实现细节">角色模型的实现细节</a></h2>
+<p>前端判定逻辑集中在 <code>web/src/services/permissions.ts</code> 与 <code>backendStore.ts</code>：</p>
+<ul>
+<li>System Admin 看 <code>auth/verify</code> 返回的 <code>user.user_type === 'system_admin'</code>，是全局角色；</li>
+<li>Team 内角色查 <code>roleInTeam()</code>——即 members 表记录的 <code>admin | member | reviewer</code>；</li>
+<li>判定顺序铁律：先判全局 admin 再查成员表；team owner 若不在 members 数组里按 member 兜底而非 admin（因为 UI 里 admin 语义是全局 admin，会被资源锁锁住页面）；</li>
+<li><code>canManageAsset</code>：admin 无全局资源特权，只能操作自己 owner 的资产；team admin 管本 team 资产。</li>
+</ul>
+<p>后端侧 Panel 不自行判角色——一切 owner/ACL 校验由内核完成，Panel 只是忠实透传并展示内核的裁决。</p>
+<h2 id="loadout-编辑的实现"><a class="header" href="#loadout-编辑的实现">Loadout 编辑的实现</a></h2>
+<p>Agent 编辑弹窗（<code>web/src/pages/team/components/AgentEditDialog.tsx</code> + <code>useAgentAssets.ts</code>）的数据来自 <code>/agent-overview/bootstrap</code>：</p>
+<ul>
+<li>Wiki/CodeGraph：allocate/unbind 增量 diff；</li>
+<li>Chat Memory：<code>setAgentFixed</code> 全量覆盖式同步（不含 Agent 自有记忆）；</li>
+<li>Skill：只读展示 fork 结果（fork 才是装配机制，见<a href="advanced/../panorama/asset-system.html">资产体系</a>）。</li>
+</ul>
+<p>解绑时的防御性细节：禁止解绑 auto-mint 的自有记忆（<code>chat_memory-{team}-{agent}</code>）；顺带清理 <code>canBindAsset=false</code> 的脏绑定；借入绑定受 ≤2 条上限约束（<code>MAX_IMPORTED_AGENTS</code>）。</p>
+<h2 id="启动任务ensure-knowledge-llm-binding"><a class="header" href="#启动任务ensure-knowledge-llm-binding">启动任务：ensure-knowledge-llm-binding</a></h2>
+<p>启动时 best-effort 执行（<code>startup/ensure-knowledge-llm-binding.ts</code>）：为每个实例确保 KS 有一个隐藏记账用户 <code>knowledge-service</code> 的 LLM 绑定——已有 key 只刷新 proxy_base_url；没有则走 Gateway mint 用户和 key 后推给 KS 的 <code>/v3/internal/llm-binding/set</code>。这保证了 Wiki 生成的成本总能归账到具体实例。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="sdk-深度使用"><a class="header" href="#sdk-深度使用">SDK 深度使用</a></h1>
+<p>当 Proxy 的"零代码注入"满足不了需求——比如你要在自研 Agent 运行时里精细控制记忆的读写时机——SDK 是正确的接入层。官方提供 TypeScript 与 Python 两个实现，能力对齐。</p>
+<h2 id="安装"><a class="header" href="#安装">安装</a></h2>
+<pre><code class="language-bash"># TypeScript
+npm install @tencentdb-agent-memory/memory-sdk-ts
+
+# Python
+pip install tencentdb-agent-memory-sdk-python
+</code></pre>
+<h2 id="typescript-客户端全景"><a class="header" href="#typescript-客户端全景">TypeScript 客户端全景</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>客户端类</th><th>覆盖端点</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>MemoryClient</code>（v3）</td><td>L0-L3 全部数据面</td><td>构造强制三元组隔离</td></tr>
+<tr><td><code>SkillClient</code></td><td><code>/v3/skill/*</code> 全部 14+ action</td><td>含对话增量摄取</td></tr>
+<tr><td><code>MetadataClient</code></td><td><code>/v3/meta/*</code> + <code>/v3/knowledge/*</code></td><td>约 60 个管理面方法</td></tr>
+<tr><td><code>MemoryPromptClient</code></td><td>自定义记忆 Prompt CRUD/绑定/生效查询</td><td></td></tr>
+<tr><td><code>MemoryGenerationLogClient</code></td><td>生成溯源 list/get/getByMemoryId</td><td></td></tr>
+</tbody></table>
+</div>
+<h3 id="最小示例"><a class="header" href="#最小示例">最小示例</a></h3>
+<pre><code class="language-typescript">import { MemoryClient } from "@tencentdb-agent-memory/memory-sdk-ts/v3";
+
+const client = new MemoryClient({
+  endpoint: "http://127.0.0.1:8420",
+  apiKey: "your-gateway-api-key",
+  serviceId: "your-memory-instance-id",
+  teamId: "team-xxx", agentId: "agt-xxx", userId: "usr-xxx",
+  sessionId: "sess-1",
+});
+
+// 写 L0
+await client.addConversation({
+  messages: [{ role: "user", content: "Hello" }],
+});
+
+// 检索 L1 原子记忆
+await client.searchAtomic({ query: "user preferences", limit: 5 });
+
+// 读 L3 长期画像
+await client.readCore();
+</code></pre>
+<h3 id="隔离模型withisolation"><a class="header" href="#隔离模型withisolation">隔离模型：withIsolation</a></h3>
+<p>v3 客户端的灵魂是三元组隔离。构造时缺任一维度直接抛 <code>ParamError</code>；需要跨作用域操作时用派生克隆：</p>
+<pre><code class="language-typescript">const scoped = client.withIsolation({ sessionId: "sess-2", agentId: "agt-other" });
+</code></pre>
+<p>几条刻意的安全设计值得注意：</p>
+<ul>
+<li><strong>写路径强制 session_id</strong>（缺失即抛错），读路径可省略以跨会话聚合；</li>
+<li><strong>deleteConversation 故意不回退默认 session</strong>——防止误删整个会话的数据；</li>
+<li>删除入参在客户端先归一化去重并限流（单批 ≤100，总 ≤5000）。</li>
+</ul>
+<h2 id="python-客户端全景"><a class="header" href="#python-客户端全景">Python 客户端全景</a></h2>
+<p>Python 版提供同步与异步双客户端（基于 httpx），方法与 TS 一一对应（snake_case）：</p>
+<pre><code class="language-python">from tencentdb_agent_memory.v3 import MemoryClient as V3   # v3 严格隔离版
+
+client = V3(endpoint="http://127.0.0.1:8420",
+            api_key="your-api-key", service_id="default",
+            team_id="team-xxx", agent_id="agt-xxx", user_id="usr-xxx")
+
+client.add_conversation(session_id="sess-1",
+                        messages=[{"role": "user", "content": "Hello"}])
+hits = client.search_atomic(query="preferences", limit=5)
+core = client.read_core()
+
+# 异步用法
+from tencentdb_agent_memory import AsyncMemoryClient
+async with AsyncMemoryClient(endpoint=..., api_key=..., service_id=...) as c:
+    await c.search_atomic(query="preferences")
+</code></pre>
+<p>注意导入路径的版本语义：包根导出默认指向 v2 兼容客户端（平滑迁移期设计），v3 需要 <code>from tencentdb_agent_memory.v3 import ...</code> 显式引入。</p>
+<p>SkillClient / MetadataClient / MemoryPromptClient / MemoryGenerationLogClient 同样有同步与异步两套。</p>
+<h2 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h2>
+<p>两端一致：非零业务 code 抛 <code>TDAMError</code>，携带 <code>code / message / request_id / details</code>。<code>request_id</code> 与 Gateway 日志对应，排查问题时带上它能直接定位服务端日志行。</p>
+<h2 id="v2--v3-差异速查"><a class="header" href="#v2--v3-差异速查">v2 → v3 差异速查</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>维度</th><th>v2</th><th>v3</th></tr></thead><tbody>
+<tr><td>路径前缀</td><td><code>/v2/*</code></td><td><code>/v3/*</code></td></tr>
+<tr><td>L0/L1 写入</td><td>session 可选</td><td><strong>session 强制</strong>（缺失 422）</td></tr>
+<tr><td>隔离参数</td><td>约定俗成</td><td>三元组协议化（body 或 <code>x-tdai-*</code> header）</td></tr>
+<tr><td>Offload/COS 直读</td><td>v2 客户端能力</td><td>移除（改由服务端统一处理）</td></tr>
+</tbody></table>
+</div>
+<p>新项目一律从 v3 开始；v2 仅用于存量兼容。</p>
+<h2 id="一个自研-agent-的典型集成节奏"><a class="header" href="#一个自研-agent-的典型集成节奏">一个自研 Agent 的典型集成节奏</a></h2>
+<pre><code class="language-text">每轮结束 ──► addConversation(messages)          # L0 回流
+构造 prompt 前 ──► readCore() + searchAtomic()  # 画像 + 相关事实
+用户问细节时 ──► queryScenario()/listScenarios() # 场景下钻
+长期任务收尾 ──► SkillClient.conversationAdd()   # 喂给 Skill 抽取缓冲区
+</code></pre>
+<p>这与<a href="advanced/./custom-adapter.html">自定义 Adapter</a>章的三步曲完全同构——SDK 就是把 Adapter 要做的三件事原语化了。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="编写自定义-adapter"><a class="header" href="#编写自定义-adapter">编写自定义 Adapter</a></h1>
+<p>如果你的 Agent 框架既不被 Proxy 支持、也不适合直接用 SDK 硬编码，就需要写一个 Adapter。官方的两个插件——OpenClaw 插件（TypeScript）与 Hermes 插件（Python）——就是为此而生的参考实现。</p>
+<h2 id="adapter-三步曲"><a class="header" href="#adapter-三步曲">Adapter 三步曲</a></h2>
+<p>一个最小可用的 Adapter 只需要完成三件事：</p>
+<ol>
+<li><strong>会话捕获（capture）</strong>：会话结束或每轮完成后，把对话写入 L0；</li>
+<li><strong>记忆召回（recall）</strong>：构造 Prompt 前，召回 L1/L2/L3 并以有边界、可识别的方式注入上下文；</li>
+<li><strong>工具暴露（tools，可选但推荐）</strong>：把记忆搜索暴露为模型可主动调用的工具。</li>
+</ol>
+<p>外加一条架构纪律：<strong>Adapter 保持无状态</strong>——不在插件进程内起 Gateway 子进程、不实现抽取逻辑；服务端是 L0 的权威存储，一切提炼交给 MemoryCore 的后台管线。</p>
+<h2 id="参考实现一openclaw-插件"><a class="header" href="#参考实现一openclaw-插件">参考实现一：OpenClaw 插件</a></h2>
+<p>目录 <code>MemoryCore/openclaw-plugin/</code>，插件 ID <code>memory-tencentdb-client</code>，基于 npm TS SDK 构建。</p>
+<p><strong>捕获</strong>（<code>src/hooks/capture.ts</code>）：挂 <code>agent_end</code> 钩子，提取本轮 user/assistant 消息。工程细节值得借鉴：用 position slice + timestamp cursor 做去重（防止钩子重复触发导致重复写入）、还原被框架污染的原始 prompt、<code>sanitizeText/stripCodeBlocks</code> 过滤噪音后再写 L0。</p>
+<p><strong>召回</strong>（<code>src/hooks/recall.ts</code>）：挂 <code>before_prompt_build</code> 钩子，执行 <code>searchAtomic + readCore</code>（可选加 listScenarios 场景导航），格式化后注入带标签的简洁记忆上下文。<code>recall.maxResults/includePersona/includeSceneNav</code> 可配。</p>
+<p><strong>工具</strong>（<code>src/tools/</code>）三个：</p>
+<ul>
+<li><code>tdai_memory_search</code>：L1 原子记忆搜索；</li>
+<li><code>tdai_conversation_search</code>：L0 对话搜索；</li>
+<li><code>tdai_read_cos</code>：经 COS STS 直读 Pipeline 产物（persona.md / scene_blocks/*.md）。</li>
+</ul>
+<p>安装：仓库根目录跑 <code>bash MemoryCore/scripts/install-openclaw-plugin.sh</code>。连接参数三件套：</p>
+<pre><code class="language-text">TDAI_MEMORY_ENDPOINT=http://127.0.0.1:8420
+TDAI_MEMORY_API_KEY=&lt;与 Gateway 相同的 API Key&gt;
+TDAI_MEMORY_INSTANCE_ID=default
+</code></pre>
+<h2 id="参考实现二hermes-插件"><a class="header" href="#参考实现二hermes-插件">参考实现二：Hermes 插件</a></h2>
+<p>目录 <code>MemoryCore/hermes-plugin/memory/memory_tencentdb/</code>，同一模式的 Python 映射，额外多一层生产级可靠性设计，值得所有 sidecar 型集成学习：</p>
+<ul>
+<li><strong>Gateway Supervisor</strong>（<code>supervisor.py</code>）：自动发现并以子进程拉起 Node Gateway sidecar，轮询 <code>/health</code> 确认就绪；</li>
+<li><strong>生命周期映射</strong>：<code>prefetch(query)</code> → <code>POST /recall</code> 同步注入 <code>&lt;memory-context&gt;</code>；<code>sync_turn(user, assistant)</code> → <code>POST /capture</code> 后台 daemon 线程 fire-and-forget（最多 4 并发背压）；<code>shutdown/on_session_end</code> → <code>POST /session/end</code>；</li>
+<li><strong>熔断器</strong>：连续 5 次失败暂停 60s，避免记忆服务故障拖垮主 agent；</li>
+<li><strong>诊断</strong>：sidecar stderr tail 保留用于排障。</li>
+</ul>
+<p>暴露两个 LLM 工具：<code>memory_tencentdb_memory_search</code> 与 <code>memory_tencentdb_conversation_search</code>。</p>
+<h2 id="什么时候选-adapter-而不是-proxy"><a class="header" href="#什么时候选-adapter-而不是-proxy">什么时候选 Adapter 而不是 Proxy</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>场景</th><th>推荐</th></tr></thead><tbody>
+<tr><td>主流 coding agent，想零改动获得注入</td><td>Proxy</td></tr>
+<tr><td>自研运行时，想完全控制注入时机与格式</td><td>SDK 直连（Adapter 思路内嵌）</td></tr>
+<tr><td>框架有原生插件/Hook 机制</td><td>Adapter</td></tr>
+<tr><td>只需要读记忆做分析，不需要回流</td><td>SDK 只读即可</td></tr>
+</tbody></table>
+</div>
+<h2 id="检查清单"><a class="header" href="#检查清单">检查清单</a></h2>
+<p>交付自定义 Adapter 前逐项确认：</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+所有请求带 <code>x-tdai-service-id</code>（实例隔离）；</li>
+<li><input disabled="" type="checkbox"/>
+v3 数据面调用携带完整三元组 + session_id（写路径强制）；</li>
+<li><input disabled="" type="checkbox"/>
+注入内容有明确边界标记（如 XML 标签），模型能区分"记忆"与"当前指令"；</li>
+<li><input disabled="" type="checkbox"/>
+召回结果限量限长，不挤占工作上下文；</li>
+<li><input disabled="" type="checkbox"/>
+记忆服务不可用时静默降级——主流程绝不因记忆故障中断；</li>
+<li><input disabled="" type="checkbox"/>
+不在 Adapter 本地落对话数据（服务端是唯一权威存储）；</li>
+<li><input disabled="" type="checkbox"/>
+凭证只从环境变量读取，不写入代码与配置仓库。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="部署形态进阶单机到多节点"><a class="header" href="#部署形态进阶单机到多节点">部署形态进阶：单机到多节点</a></h1>
+<p>入门篇的一键三件套适合体验与小团队。本章讨论当规模、可靠性或合规要求提高时，各组件如何演进。</p>
+<h2 id="形态一standalone-单机默认"><a class="header" href="#形态一standalone-单机默认">形态一：Standalone 单机（默认）</a></h2>
+<p>MemoryCore 的 standalone 模式是整个项目的默认形态：</p>
+<ul>
+<li>状态全在进程内：任务队列用内存 Map + checkpoint 文件，定时器用 <code>setTimeout</code>；</li>
+<li>存储：SQLite + 本地数据目录（<code>~/.memory-tencentdb/memory-tdai</code>）；</li>
+<li>唯一外部依赖是 LLM API。</li>
+</ul>
+<p>适用：个人使用、开发调试、Agent sidecar。局限：单点、无水平扩展、重启瞬间丢失进行中的管线任务（checkpoint 会恢复大部分状态）。</p>
+<h2 id="形态二service-模式"><a class="header" href="#形态二service-模式">形态二：Service 模式</a></h2>
+<p>把 <code>deployMode</code> 切到 service 后，有状态的部分全部外置：</p>
+<div class="table-wrapper"><table><thead><tr><th>组件</th><th>外置为</th></tr></thead><tbody>
+<tr><td>任务队列</td><td>Redis Stream</td></tr>
+<tr><td>定时调度</td><td>16 分片的 Timer ZSET（Lua 脚本原子认领）</td></tr>
+<tr><td>并发控制</td><td>分布式锁 <code>pipeline:{inst:tid:aid}[:s:sess]</code></td></tr>
+<tr><td>向量存储</td><td>TCVDB（服务端原生 hybrid 检索）</td></tr>
+<tr><td>大对象</td><td>COS</td></tr>
+<tr><td>元数据</td><td>MongoDB（可选）</td></tr>
+</tbody></table>
+</div>
+<p>关键在于<strong>业务 handler 与执行器完全复用</strong>——两态差异收敛在 <code>pipeline-manager.ts</code> 与 <code>stateful-pipeline-manager.ts</code> 的状态管理层。这意味着从单机迁到 service 不需要改任何业务代码，只改配置与基础设施。</p>
+<h2 id="proxy-的多节点要点"><a class="header" href="#proxy-的多节点要点">Proxy 的多节点要点</a></h2>
+<p>Proxy 无状态化的前提是三个配置同时到位，缺一不可：</p>
+<ol>
+<li><strong><code>storage.backend=cos</code></strong>：会话/注入/Skill 状态跨节点共享。降级链上 sqlite/fs/memory 都不能多实例共享——用它们做多节点会导致各实例状态分裂；</li>
+<li><strong><code>injection.externalGatewayUrl</code> 显式配置</strong>：让注入缓存指向统一入口。否则每个实例各自缓存，同一会话的请求轮转在不同实例上会造成上游 KV cache 反复 miss——成本和延迟双输；</li>
+<li><strong>可选的一致性哈希网关</strong>（<code>MemoryProxy/gateway/</code>）：按 keyId 一致性哈希把同一用户固定到同一 proxy 实例，进一步稳定缓存命中。<code>/skill-bridge</code> 与 <code>/memory-bridge</code> 前缀由外层 gateway 原样透传到 proxy 实例。</li>
+</ol>
+<p>运维配套：<code>/v3/instance/proxy-destroy</code> 在实例销毁时清 COS 缓存；<code>/health</code> 的 <code>storage.effective</code> 是确认实际生效后端的观测锚点；停机前确保 L0 pending write 队列 flush 完成。</p>
+<h2 id="合并镜像与镜像发布"><a class="header" href="#合并镜像与镜像发布">合并镜像与镜像发布</a></h2>
+<p><strong>panel-knowledge-combined</strong>：Panel + KS 打进一个镜像（<code>deploy/panel-knowledge-combined/</code>），四阶段构建（panel-ui-builder → panel-builder → knowledge-builder → runtime）。入口脚本 <code>start-combined.sh</code> 优先尊重用户 bind-mount 的 <code>metadata-instances.json</code>；没有时用 env 现场生成单实例注册表，然后同容器拉起双进程。云上部署最少只需三项配置：instances JSON、<code>KNOWLEDGE_PUBLIC_BASE_URL</code>（必须含 <code>/v3</code> 且外部可达）、<code>KNOWLEDGE_LLM_PROXY_BASE_URL</code>。</p>
+<p><strong>dockerhub 发布流水线</strong>（<code>deploy/dockerhub/publish.sh</code>）：</p>
+<pre><code class="language-bash">VERSION=x.y.z ./publish.sh all   # 或 memory-core / memory-proxy / memory-hub
+</code></pre>
+<p>buildx 多架构（linux/amd64 + arm64）；<code>NAMESPACE=agentmemory</code>；支持 <code>ALSO_LATEST/PUSH/DRY_RUN/APT_MIRROR</code> 等开关。两个值得知道的细节：Proxy 的私有模块 cost-guard 用 stub 包顶替（运行时动态 import 失败自动降级直通）；MemoryCore 的 integrations 目录在 .dockerignore 中排除并走 fallback——开源镜像不携带内部集成代码，但功能完整。</p>
+<h2 id="安全加固清单"><a class="header" href="#安全加固清单">安全加固清单</a></h2>
+<p>生产部署前过一遍：</p>
+<ul>
+<li><strong>Gateway 层</strong>：非回环监听必须设置 <code>TDAI_GATEWAY_API_KEY</code>；CORS 默认关闭，只放行明确可信 Origin，禁止 <code>*</code>；</li>
+<li><strong>Proxy 层</strong>：启用 <code>auth.enabled=true</code>；env 注入 <code>TDAI_PROXY_ADMIN_API_KEY</code> 保护运维端点；</li>
+<li><strong>凭证管理</strong>：一切 Secret 走环境变量或 Secret Manager；<code>.env</code>/数据库文件/日志/导出数据绝不入库；提交前跑 <code>bash MemoryPanel/scripts/secret-scan.sh --strict</code>；</li>
+<li><strong>租户隔离</strong>：每个请求校验实例与 Team/User/Agent 归属，防止跨租户访问；</li>
+<li><strong>凭证泄漏应急</strong>：凭证一旦进入 Git 历史，立即轮换并清理历史。</li>
+</ul>
+<h2 id="容量与成本直觉"><a class="header" href="#容量与成本直觉">容量与成本直觉</a></h2>
+<p>最后给几条 sizing 直觉：</p>
+<ul>
+<li>记忆提炼（L1/L2/L3）的 LLM 开销与对话量成正比，<code>everyNConversations</code> 调大可省 token 但记忆更新变慢；</li>
+<li>Wiki ingest 是一次性大消耗（整批文档抽取），之后增量维护很便宜；</li>
+<li>Proxy 注入本身零 LLM 成本，但注入内容增加会推高每轮 input token——给不同角色配不同 Loadout 同时也是成本控制手段；</li>
+<li>CodeGraph 索引构建 CPU 密集，Auto-Sync 的扫描周期与并发数按仓库数量与机器规格权衡。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="可观测性体系"><a class="header" href="#可观测性体系">可观测性体系</a></h1>
+<p>记忆系统是异步的、多级的、跨四个服务的——出了问题"为什么这条记忆没生成/没被注入"必须靠可观测性回答。本章梳理三套互相独立的上报体系与日志约定。</p>
+<h2 id="proxy-的三路-apm-上报"><a class="header" href="#proxy-的三路-apm-上报">Proxy 的三路 APM 上报</a></h2>
+<p>每次经过 Proxy 的 turn 可以同时上报三个平台，<strong>三路完全独立，任一失败不影响业务与其他路</strong>：</p>
+<div class="table-wrapper"><table><thead><tr><th>平台</th><th>粒度</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>Opik</strong></td><td>trace</td><td>LLM 调用链路追踪</td></tr>
+<tr><td><strong>Langfuse</strong></td><td>trace（一个 trace = 一个 turn）</td><td>对话轮次级追踪</td></tr>
+<tr><td><strong>ClickHouse</strong></td><td>按 turn</td><td>token 用量明细（计费数据源）</td></tr>
+</tbody></table>
+</div>
+<p>源码对应 <code>src/opik.ts / langfuse.ts / clickhouse.ts</code>。设计哲学是 error-silent：上报失败记日志、吞异常，绝不把可观测性故障传染给用户对话。</p>
+<h2 id="ks-的埋点"><a class="header" href="#ks-的埋点">KS 的埋点</a></h2>
+<p>Knowledge Service 有两套可选遥测：</p>
+<p><strong>ClickHouse 工具调用日志</strong>：<code>KNOWLEDGE_CLICKHOUSE_ENABLED=true</code> 后，每个 <code>POST /v3/tools/call</code> 写入 <code>tool_call_logs</code> 表。隐私处理值得细看：请求正文<strong>递归脱敏并截断到 512 bytes</strong>；若调用方传了 <code>x-conversation-id</code>、<code>x-tdai-user-id/team-id/agent-id/space-id/turn-seq</code> 等 header，这些维度一并入库用于归因——但密钥永远不进库。</p>
+<p><strong>Langfuse</strong>：配置 <code>LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY</code> 后上报 Wiki 生成过程的 LLM 调用；未配置时整体关闭，零开销。</p>
+<h2 id="core-的内置度量"><a class="header" href="#core-的内置度量">Core 的内置度量</a></h2>
+<p>MemoryCore 不依赖外部 APM 也有一层自观测：</p>
+<ul>
+<li><strong><code>GET /health</code></strong>：除了存活探针，还暴露 pipelineWorker 的 <code>tasksConsumed/tasksCompleted</code> 计数——这是确认"提炼管线在干活"最直接的指标；</li>
+<li><strong>召回度量</strong>（<code>src/core/report/metric-tracking-recall.ts</code>）：记录召回最高分（recall_top_score）等指标；</li>
+<li><strong>性能日志标签</strong>：如 <code>[skill-perf]</code> 输出 Skill 检索耗时分解。</li>
+</ul>
+<h2 id="日志标签地图"><a class="header" href="#日志标签地图">日志标签地图</a></h2>
+<p>排查问题时按组件认日志前缀：</p>
+<div class="table-wrapper"><table><thead><tr><th>标签</th><th>来源</th></tr></thead><tbody>
+<tr><td><code>[tdai-gateway]</code></td><td>MemoryCore Gateway</td></tr>
+<tr><td><code>[memory-tdai][...]</code></td><td>MemoryCore 核心模块</td></tr>
+<tr><td><code>[META-V3]</code></td><td>v3 管理面</td></tr>
+<tr><td><code>[skill-perf]</code></td><td>Skill 检索性能</td></tr>
+</tbody></table>
+</div>
+<p>Panel 侧的 kernel 适配器对所有出站日志做脱敏（password/api_key/token/user_key 打码）与截断；Proxy 的结构化日志写入 <code>logs/YYYY-MM-DD.log</code>（<code>proxy.sh log</code> 直接 tail）。</p>
+<h2 id="效果评估注入到底值不值"><a class="header" href="#效果评估注入到底值不值">效果评估：注入到底值不值</a></h2>
+<p>除了"系统是否正常"，还有一类问题更难答："注入的记忆/Skill/知识对回答质量有没有实际帮助？"Proxy 为此内置了<strong>资产反思</strong>机制（asset reflection）：</p>
+<ul>
+<li>双闸门开启：config 里 <code>injection.assetReflection.markerOptIn: true</code> <strong>且</strong> URL 显式带 <code>/analyse/</code> 段：
+<pre><code class="language-text">http://&lt;proxy&gt;:8096/claude-code/&lt;spaceId&gt;/analyse/v1/messages
+</code></pre>
+</li>
+<li>开启后 system prompt 末尾追加 <code>&lt;asset_reflection&gt;</code> 块，指导 LLM 在最终回答末尾<strong>只对本轮真正调用过的资产工具</strong>逐个复盘：是否起作用、拿到了什么关键信息、或为何未命中；</li>
+<li>本轮完全没用工具也要输出固定一行："【资产反思】本轮未使用任何云端资产工具。"</li>
+</ul>
+<p>定位是<strong>接入效果验证</strong>：把评测集或 staging 会话导到 <code>/analyse</code> URL 上，直接读回 LLM 自己给出的逐工具评价。<code>markerOptIn=false</code> 时带 marker 的请求直接 404——刻意防止客户端以为开了实际却 fall through。不要对线上真实流量默认打开。</p>
+<h2 id="建议的最小监控组合"><a class="header" href="#建议的最小监控组合">建议的最小监控组合</a></h2>
+<p>生产环境至少盯四样东西：</p>
+<ol>
+<li>四个服务的 <code>/health</code>（Core 的 pipelineWorker 计数尤其重要）；</li>
+<li>Proxy <code>/health</code> 里的 <code>storage.effective</code>——确认存储后端没有意外降级到 memory；</li>
+<li>ClickHouse 的 token 消耗趋势（成本异常往往先在这里显形）;</li>
+<li>定期抽查 Generation Log——记忆质量回归比服务故障更隐蔽。</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="升级与数据迁移"><a class="header" href="#升级与数据迁移">升级与数据迁移</a></h1>
+<h2 id="版本演进脉络"><a class="header" href="#版本演进脉络">版本演进脉络</a></h2>
+<p>公开仓库的 CHANGELOG 从 2.0.0-beta.1 起步（更早的 v0.x/v1.x 是内部历史）。关键节点：</p>
+<div class="table-wrapper"><table><thead><tr><th>版本</th><th>时间</th><th>里程碑</th></tr></thead><tbody>
+<tr><td>2.0.0-beta.1</td><td>2026-07-21</td><td>首次公开发布：四类记忆资产、Memory Hub、Proxy 双协议、三镜像、官方 SDK</td></tr>
+<tr><td>2.0.0</td><td>2026-08-03</td><td>Skill 强制归档、CodeGraph 定时同步、Cost Guard、面板中英文、System Admin 开放资产管理</td></tr>
+<tr><td>2.0.1-beta.1</td><td>2026-08-13</td><td>冷启动开箱即用（默认 Agent + 预置 Skill）、Wiki 并发加速、Codex/WorkBuddy/dsh 接入、清空对话记忆</td></tr>
+<tr><td>2.0.1-beta.2</td><td>最新</td><td>发布迭代（文档与图标更新）</td></tr>
+</tbody></table>
+</div>
+<h2 id="数据迁移v2--v3"><a class="header" href="#数据迁移v2--v3">数据迁移：v2 → v3</a></h2>
+<p>v1.x / v0.x 的数据格式是 v2；v2.0.0+ 使用格式 v3。<strong>升级后必须先迁移再启动新版 Gateway</strong>，否则新代码无法读取旧数据。</p>
+<h3 id="迁移步骤"><a class="header" href="#迁移步骤">迁移步骤</a></h3>
+<pre><code class="language-bash"># 0) 备份！备份整个数据目录
+cp -r ~/.memory-tencentdb/memory-tdai ~/.memory-tencentdb/memory-tdai.bak
+
+# 1) dry-run 检查，确认无报错
+python scripts/migrate-v2-to-v3/v2-to-v3-migrate.py \
+  ~/.memory-tencentdb/memory-tdai --dry-run
+
+# 2) 正式执行
+python scripts/migrate-v2-to-v3/v2-to-v3-migrate.py \
+  ~/.memory-tencentdb/memory-tdai
+</code></pre>
+<p>工具位于 <code>MemoryCore/scripts/migrate-v2-to-v3/</code>，目录内有独立的 README 说明全部参数。其他存量迁移脚本还有 <code>migrate-sqlite-to-tcvdb</code>（SQLite → 腾讯云向量库）与 <code>import-opik-to-memory-core</code>（从 Opik 导入历史数据）。</p>
+<h2 id="升级操作建议"><a class="header" href="#升级操作建议">升级操作建议</a></h2>
+<ul>
+<li><strong>Docker 部署</strong>：named volume 里的数据跨版本保留；拉新镜像重启即可。跨大版本（v1→v2）先对 volume 里的数据目录跑迁移脚本；</li>
+<li><strong>源码部署</strong>：pull 后 <code>npm install &amp;&amp; npm run build</code> 再迁移再启动；</li>
+<li><strong>SDK</strong>：注意 npm 包名曾迁出 <code>-v2</code> 后缀的历史；Python 包根导入默认给 v2 兼容客户端，v3 要显式 <code>from tencentdb_agent_memory.v3 import ...</code>；</li>
+<li><strong>Proxy 客户端配置</strong>：小版本内兼容；大版本留意 INSTALL 文档中的已知限制变化（例如 <code>x-task-id</code> 必填是否放开）。</li>
+</ul>
+<h2 id="ci-红线贡献者必读"><a class="header" href="#ci-红线贡献者必读">CI 红线：贡献者必读</a></h2>
+<p>项目的 CI（<code>.github/workflows/pr-ci.yml</code>）目前聚焦 MemoryCore，五个 job：</p>
+<ol>
+<li><strong>Install</strong>：Node 22 + 依赖缓存；</li>
+<li><strong>Pack</strong>：<code>npm pack</code> 并上传 tgz 工件（7 天留存）;</li>
+<li><strong>Manifest</strong>：校验 <code>openclaw.plugin.json</code> 合法性与 package.json 的 OpenClaw 扩展元数据；</li>
+<li><strong>Size Guard</strong>：tarball ≤ 2048 KB，超了直接失败——插件体积是被硬约束的；</li>
+<li><strong>Skill Queue Isolation</strong>（最特殊）：跑 <code>scripts/ci/check-skill-queue-isolation.sh</code>，基于设计文档 <code>docs/design/2026-06-16-skill-extract-queue.md</code> 检查 diff：
+<ul>
+<li>禁止触碰记忆模块红线文件（state/pipeline-worker/integrations/redis）;</li>
+<li>禁止 <code>src/core/skill/**</code> 新增直接 fs import。</li>
+</ul>
+</li>
+</ol>
+<p>这条红线的背景：Skill 抽取队列被刻意设计为与记忆管线隔离的独立队列——保证 Skill 归档的延迟不影响主记忆链路，也保证它不依赖进程本地状态。改动这些区域前先读对应设计文档。</p>
+<h2 id="roadmap-摘要"><a class="header" href="#roadmap-摘要">Roadmap 摘要</a></h2>
+<p>v2.0.1 正式版规划中的重点方向：</p>
+<ul>
+<li><strong>Agent 模版</strong>：管理员定义默认 Agent 的初始资产装配（冷启动的下一步）；</li>
+<li><strong><code>mem:</code> 指令扩展到 Task 维度</strong>：对话内创建/更新 Task；</li>
+<li><strong>记忆可编辑</strong>：L1-L3 支持面板编辑修正——从"系统产出的结果"变为"可人工校准的资产"；</li>
+<li><strong>L0/L1 记忆搜索</strong>：按内容定位而不仅是时间过滤；</li>
+<li><strong>Cursor 支持</strong>：新增客户端适配。</li>
+</ul>
+<p>完整计划见仓库 <code>ROADMAP_CN.md</code>；优先级会根据社区反馈动态调整。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="环境变量速查"><a class="header" href="#环境变量速查">环境变量速查</a></h1>
+<p>按组件归类的常用环境变量。完整清单以各组件 <code>.env.example</code> 与配置模板为准。</p>
+<h2 id="memorycoregateway"><a class="header" href="#memorycoregateway">MemoryCore（Gateway）</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>默认值</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>TDAI_GATEWAY_CONFIG</code></td><td>自动发现</td><td>配置文件路径</td></tr>
+<tr><td><code>TDAI_GATEWAY_HOST</code></td><td><code>127.0.0.1</code></td><td>监听地址</td></tr>
+<tr><td><code>TDAI_GATEWAY_PORT</code></td><td><code>8420</code></td><td>监听端口</td></tr>
+<tr><td><code>TDAI_GATEWAY_API_KEY</code></td><td>未设置</td><td>Bearer 鉴权；<strong>非回环监听必须设置</strong></td></tr>
+<tr><td><code>TDAI_CORS_ORIGINS</code></td><td>空</td><td>允许的 Origin，逗号分隔</td></tr>
+<tr><td><code>TDAI_DATA_DIR</code></td><td><code>~/.memory-tencentdb/memory-tdai</code></td><td>本地数据目录</td></tr>
+<tr><td><code>TDAI_LLM_API_KEY</code></td><td>空</td><td>LLM API Key</td></tr>
+<tr><td><code>TDAI_LLM_BASE_URL</code></td><td><code>https://api.openai.com/v1</code></td><td>OpenAI-compatible API 地址</td></tr>
+<tr><td><code>TDAI_LLM_MODEL</code></td><td><code>gpt-4o</code></td><td>模型名</td></tr>
+<tr><td><code>TDAI_SKILL_ENABLED</code></td><td>配置文件值</td><td>强制启用 Skill 模块</td></tr>
+</tbody></table>
+</div>
+<p>配置加载优先级：<code>TDAI_GATEWAY_CONFIG</code> → 当前目录 → 数据目录 → 环境变量 → 内置默认。</p>
+<h2 id="memoryproxy"><a class="header" href="#memoryproxy">MemoryProxy</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>TDAI_MEMORY_SYSTEM_USER_ID</code></td><td>memory 内部服务账号 user_id</td></tr>
+<tr><td><code>TDAI_MEMORY_SYSTEM_USER_KEY</code></td><td>内部服务账号 apiKey</td></tr>
+<tr><td><code>TDAI_PROXY_ADMIN_API_KEY</code></td><td>运维端点 shared secret</td></tr>
+<tr><td><code>PROXY_DB_PATH</code></td><td>sqlite 后端 db 路径兜底</td></tr>
+<tr><td><code>PROXY_FULL_STACK</code></td><td><code>1</code> 一键打开 auth + sessionInit + tdai 全流水线</td></tr>
+<tr><td><code>PROXY_ENABLE_AUTH</code> / <code>PROXY_ENABLE_SESSION_INIT</code> / <code>PROXY_ENABLE_TDAI</code></td><td>三大开关，可单独控制</td></tr>
+<tr><td><code>PROXY_CONFIG_DIR</code></td><td>指向自维护 config.yaml 目录（绕开 start-proxy.sh 覆写）</td></tr>
+</tbody></table>
+</div>
+<p>主要配置在 <code>config.yaml</code>（CLI 参数 &gt; YAML &gt; 内置默认），关键段：<code>upstream</code> / <code>auth</code> / <code>tdai</code> / <code>skill</code> / <code>knowledge</code> / <code>injection</code> / <code>extraction</code> / <code>sessionInit</code> / <code>storage</code> / <code>redis</code> / <code>rateLimit</code> / <code>clickhouse</code> / <code>creditReport</code>。</p>
+<h2 id="memoryknowledge"><a class="header" href="#memoryknowledge">MemoryKnowledge</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>PORT</code></td><td>默认 8421（开发）/ 8424（合并镜像）</td></tr>
+<tr><td><code>API_PREFIX</code></td><td>固定 <code>/v3</code></td></tr>
+<tr><td><code>KNOWLEDGE_DATA_DIR</code> / <code>KNOWLEDGE_DB_PATH</code></td><td>数据目录与 SQLite 路径</td></tr>
+<tr><td><code>KNOWLEDGE_PUBLIC_BASE_URL</code></td><td>写入资源 service_url；<strong>必须含 <code>/v3</code> 且 Agent 可达</strong></td></tr>
+<tr><td><code>TMC_CALLBACK_URL</code></td><td>Panel 根地址（不带 callback path）</td></tr>
+<tr><td><code>LLM_MODE</code></td><td><code>proxy</code>（默认，用 Panel 推送的 binding）/ <code>custom</code>（本地直连）</td></tr>
+<tr><td><code>LLM_API_KEY</code> / <code>LLM_BASE_URL</code> / <code>LLM_MODEL</code> / <code>LLM_PROTOCOL</code></td><td>custom 模式的直连参数</td></tr>
+<tr><td><code>KNOWLEDGE_AUTO_SYNC_ENABLED</code></td><td>Auto-Sync 总开关（默认关）</td></tr>
+<tr><td><code>KNOWLEDGE_AUTO_SYNC_SCAN_INTERVAL_MIN</code></td><td>扫描周期分钟数（默认 10，clamp 1–60）</td></tr>
+<tr><td><code>KNOWLEDGE_AUTO_SYNC_MAX_CONCURRENT</code></td><td>worker 数（默认 3，clamp 1–20）</td></tr>
+<tr><td><code>KNOWLEDGE_CLICKHOUSE_*</code></td><td>ClickHouse 工具调用埋点（URL/DATABASE/TABLE/USER/PASSWORD…）</td></tr>
+<tr><td><code>LANGFUSE_PUBLIC_KEY</code> / <code>LANGFUSE_SECRET_KEY</code></td><td>Wiki LLM 调用 trace</td></tr>
+</tbody></table>
+</div>
+<h2 id="memory-hub--panel"><a class="header" href="#memory-hub--panel">Memory Hub / Panel</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>REMOTE_INSTANCE_ID</code> / <code>REMOTE_INSTANCE_URL</code> / <code>REMOTE_INSTANCE_KEY</code></td><td>单实例快捷注册（容器网内别名如 <code>http://memory-core:8420</code>）</td></tr>
+<tr><td><code>REMOTE_INSTANCE_PROXY_URL</code></td><td>UI 客户端接入地址卡片展示用</td></tr>
+<tr><td><code>KNOWLEDGE_SERVICE_URL</code></td><td>Panel → KS 管理地址（不带 <code>/v3</code>）</td></tr>
+<tr><td><code>KNOWLEDGE_LLM_BINDING_SYNC</code></td><td>启动时是否推送 llm_binding</td></tr>
+<tr><td><code>METADATA_INSTANCES_CONFIG</code></td><td>实例注册表路径</td></tr>
+</tbody></table>
+</div>
+<h2 id="部署脚本deployglobal-imagesenv"><a class="header" href="#部署脚本deployglobal-imagesenv">部署脚本（deploy/global-images/.env）</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>变量组</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>MEMORY_LLM_BASE_URL / _API_KEY / _MODEL</code></td><td>Core + Hub 内部提炼/生成用 LLM</td></tr>
+<tr><td><code>PROXY_UPSTREAM_URL / _API_KEY / _MODEL</code></td><td>Proxy 转发的上游模型</td></tr>
+<tr><td><code>PULL=1</code></td><td>启动前拉取最新镜像</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="术语表"><a class="header" href="#术语表">术语表</a></h1>
+<p>按概念相关性分组，供阅读文档与源码时快速对照。</p>
+<h2 id="记忆模型"><a class="header" href="#记忆模型">记忆模型</a></h2>
+<p><strong>L0 Conversation</strong>：原始对话层。完整保留上下文，用于核对原话、时间与来源。</p>
+<p><strong>L1 Atom（原子记忆）</strong>：从对话中提取的事实、偏好、约束与事件，是最常被精确召回的一层。</p>
+<p><strong>L2 Scenario / Profile（场景记忆）</strong>：围绕项目或场景组织的知识块（Scene Markdown），挂在 Agent Profile 下，用于快速恢复工作场景。</p>
+<p><strong>L3 Core / Persona（核心画像）</strong>：跨场景沉淀的长期画像与稳定模式。</p>
+<p><strong>Generation Log（生成溯源）</strong>：每次 L1/L2/L3 生成留下的证据记录——Prompt ID、版本、内容哈希、输入输出引用。</p>
+<h2 id="资产与权限"><a class="header" href="#资产与权限">资产与权限</a></h2>
+<p><strong>Memory Asset（记忆资产）</strong>：Chat Memory、Skill、Wiki、CodeGraph 的统一登记形态，携带 Owner/Team/可见性/版本等元信息。</p>
+<p><strong>Visibility（可见性）</strong>：<code>private</code>（仅 Owner）/ <code>team</code>（团队成员）/ <code>restricted</code>（ACL 精确授权）/ <code>agent</code>（定向装配）四级。</p>
+<p><strong>Fixed Binding（固定绑定）</strong>：Agent 与资产间的显式绑定关系，Loadout 的数据基础。</p>
+<p><strong>ACL</strong>：User/Role/Agent 粒度的访问控制表，配合 restricted 可见性使用。</p>
+<p><strong>Loadout（装配）</strong>：一个 Agent 实际携带的记忆资产组合——先按权限收敛、再按问题召回。</p>
+<h2 id="组织结构"><a class="header" href="#组织结构">组织结构</a></h2>
+<p><strong>Team / Agent / Task 三元组</strong>：v3 数据面的强隔离维度。Team 是资产容器；Agent 是角色化执行者（也是被管理的元数据实体）；Task 是可选的工作抓手。</p>
+<p><strong>Memory Instance（记忆实例）</strong>：逻辑隔离的数据单元，请求经 <code>x-tdai-service-id</code> 声明；在 Proxy URL 中表现为 <code>&lt;spaceId&gt;</code> 段。</p>
+<p><strong>System Admin / Team Admin / Member</strong>：全局运维角色与团队内角色的两层体系。</p>
+<h2 id="服务与接口"><a class="header" href="#服务与接口">服务与接口</a></h2>
+<p><strong>MemoryCore</strong>：记忆与元数据核心服务（:8420），数据权威所在。</p>
+<p><strong>Knowledge Service（KS）</strong>：Wiki + CodeGraph 引擎（:8421/:8424），API 前缀 <code>/v3</code>。</p>
+<p><strong>Panel / Memory Hub</strong>：无状态 Web 管理控制台（:8125）。</p>
+<p><strong>MemoryProxy</strong>：透明 LLM 请求代理（:8096），在转发前后完成会话初始化、注入、回流与上报。</p>
+<p><strong>Session Init（会话初始化）</strong>：首次对话时绑定 team → agent → task 的交互流程；无法交互的客户端用 <code>x-team-id</code> 等 header 直接注册。</p>
+<p><strong>Tools 协议</strong>：<code>POST /v3/tools/list</code> + <code>/v3/tools/call</code> 的能力自发现协议，知识按需调用的落地形态。</p>
+<h2 id="存储与算法"><a class="header" href="#存储与算法">存储与算法</a></h2>
+<p><strong>RRF（Reciprocal Rank Fusion）</strong>：多路检索结果的排名融合算法，score = Σ 1/(k + rank)，k=60。</p>
+<p><strong>BM25 / FTS5</strong>：关键词检索算法与其 SQLite 实现；配合 jieba 中文分词。</p>
+<p><strong>sqlite-vec / TCVDB</strong>：本地向量扩展与腾讯云向量数据库；后者提供服务端原生 hybrid 检索。</p>
+<p><strong>ProxyStorage</strong>：Proxy 的统一存储抽象，四后端 cos/sqlite/fs/memory 加降级链。</p>
+<p><strong>Offload</strong>：大对象到 COS 或本地文件的下沉存储。</p>
+<h2 id="运行机制"><a class="header" href="#运行机制">运行机制</a></h2>
+<p><strong>Pipeline（提炼管线）</strong>：L0 → L1 → L2/L3 的异步生成系统，由 Scanner 触发、Worker 执行。</p>
+<p><strong>Warm-up（预热阈值）</strong>：新会话的触发阈值 1→2→4→8→…→N 翻倍爬升机制，保证冷启动快速产出首批记忆。</p>
+<p><strong>KV Cache 保护</strong>："稳定内容进 system prompt 尾部命中缓存，易变内容走工具"的注入分层原则。</p>
+<p><strong>mem: 指令</strong>：Proxy 在对话内拦截的轻量操作入口，如 <code>mem:sync</code>、<code>mem:create-skill</code>。</p>
+<p><strong>Adapter 三步曲</strong>：自定义接入件的标准模式——capture（写 L0）、recall（召回注入）、tools（暴露查询工具）。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="faq-汇编"><a class="header" href="#faq-汇编">FAQ 汇编</a></h1>
+<p>按主题归档的常见问题。部署类问题另见<a href="appendix/../getting-started/troubleshooting.html">常见问题排查</a>。</p>
+<h2 id="产品与定位"><a class="header" href="#产品与定位">产品与定位</a></h2>
+<p><strong>Q：和直接给 Agent 加一个"记忆插件"有什么区别？</strong></p>
+<p>单机记忆插件把记忆锁在单个 Agent/框架里。本项目的记忆是<strong>资产化的团队资源</strong>：带 Owner、版本、可见性与 ACL，可以跨框架迁移、跨成员共享，由人审核与装配。Proxy 模式下甚至不需要任何插件——改一个 base URL 就接入。</p>
+<p><strong>Q：必须用腾讯云的产品吗？</strong></p>
+<p>不需要。默认形态只用 SQLite + 本地文件 + 任一 OpenAI-compatible LLM API；TCVDB（腾讯云向量库）与 COS 都是可选升级项，用于规模化场景。</p>
+<p><strong>Q：支持哪些 Agent？</strong></p>
+<p>经 Proxy 零代码接入：Claude Code、CodeBuddy、WorkBuddy、Codex CLI、DeepSeek Harness、Hermes、OpenClaw；任何 OpenAI 兼容平台可走通用接入法；自研运行时用 TS/Python SDK。</p>
+<h2 id="架构与数据"><a class="header" href="#架构与数据">架构与数据</a></h2>
+<p><strong>Q：我的对话数据存在哪里？</strong></p>
+<p>standalone 默认在 <code>~/.memory-tencentdb/memory-tdai</code>（SQLite + 本地文件）。Docker 部署在 named volume 中。Proxy 自身不落任何记忆数据。</p>
+<p><strong>Q：L1/L2/L3 是实时生成的吗？</strong></p>
+<p>不是。写入 L0 后由后台管线异步提炼：默认每 5 轮触发一次（新会话有 1→2→4→8 的预热加速），会话空闲超时也会触发。这是刻意设计——提炼不该阻塞对话本身。</p>
+<p><strong>Q：记忆会不会把上下文撑爆？</strong></p>
+<p>不会，这是设计的核心关切之一：召回有条数上限、字符预算与超时三重护栏；注入侧遵循"稳定进缓存、易变走工具"的分层；知识（Wiki/CodeGraph）平时只是可调用的工具，不进入上下文。</p>
+<p><strong>Q：自动抽取的记忆错了怎么办？</strong></p>
+<p>当前版本可在面板删除后重建；v2.0.1 正式版计划开放 L1-L3 的面板编辑。自定义 Memory Prompt 可以从源头调整提炼关注点，减少系统性偏差。</p>
+<h2 id="使用技巧"><a class="header" href="#使用技巧">使用技巧</a></h2>
+<p><strong>Q：怎么让记忆更快"长出来"？</strong></p>
+<p>做真实工作对话（改文件、跑测试、给结论），明确说出约束与偏好；用 <code>mem:create-skill</code> 显式归档有价值的过程；导入历史 Session 补足存量。<code>promptMode=code</code> 只对代码类对话有效，闲聊抽不出东西。</p>
+<p><strong>Q：如何验证注入真的生效了？</strong></p>
+<p>三步：<code>mem:help</code> 有响应 → Core <code>/health</code> 的 pipelineWorker 计数增长 → 用 <code>/analyse</code> marker 做一轮资产反思评估（见<a href="appendix/../advanced/observability.html">可观测性</a>章）。</p>
+<p><strong>Q：多个 Agent 可以共享同一条记忆吗？</strong></p>
+<p>可以，这正是 Team 的意义：把资产可见性设为 team 或通过 ACL 授权，再绑定到需要的 Agent。注意 Skill 的共享方式是 fork 副本而非绑定。</p>
+<h2 id="开发与贡献"><a class="header" href="#开发与贡献">开发与贡献</a></h2>
+<p><strong>Q：想贡献代码，从哪里入手？</strong></p>
+<p>读 <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/blob/main/CONTRIBUTING_CN.md">CONTRIBUTING_CN.md</a>；特别欢迎的方向是新框架 Adapter 与 Memory Hub 用法。注意 CI 的 Skill Queue Isolation 红线（见<a href="appendix/../advanced/upgrade-migration.html">升级与迁移</a>章）。</p>
+<p><strong>Q：CodeGraph 支持私有仓库吗？</strong></p>
+<p>当前优先支持公开 HTTPS 仓库；私有仓库与 SSH 凭证接入在完善中。</p>
+<p><strong>Q：哪里可以反馈问题？</strong></p>
+<p>GitHub Issues（项目方承诺 24 小时内响应）；想法交流去 Discussions；也有微信社群。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>

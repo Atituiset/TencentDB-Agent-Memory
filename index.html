@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Agent 记忆的问题意识 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/intro/index.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="agent-记忆的问题意识"><a class="header" href="#agent-记忆的问题意识">Agent 记忆的问题意识</a></h1>
+<h2 id="从一个很实际的问题出发"><a class="header" href="#从一个很实际的问题出发">从一个很实际的问题出发</a></h2>
+<p>使用 AI Agent 工作一段时间后，几乎每个人都会遇到同样的挫败感：<strong>重复劳动</strong>。</p>
+<p>项目背景讲过了，换个 Session 就得再讲一遍。文档读过了，每个新 Agent 都要从第一页重读。一套排障方法已经跑通了，下次遇到同类问题，Agent 还是会从零摸索。这些成本不是一次性的，而是随着每一次新会话、每一个新 Agent、每一位新成员不断重付。</p>
+<p>TencentDB Agent Memory 的出发点，就是对准这个问题：<strong>怎样减少使用 Agent 时的重复工作？</strong></p>
+<p>答案不是"把聊天记录存下来"。存下来的对话只是化石——它能证明发生过什么，却不能让下一个 Agent 少走弯路。真正有价值的，是从对话中提炼出的那些<strong>可复用的经验</strong>：</p>
+<pre><code class="language-text">已有信息 → 可复用记忆资产 → 更少 Turns → 更少返工 → 更稳定的结果和更高的效率
+</code></pre>
+<p>所以这个项目对 Memory 的定义比"记住对话"要宽得多：<strong>凡是能让下一个 Agent 少走弯路的信息，都应该被保存、组织并复用。</strong></p>
+<h2 id="三类最典型的浪费"><a class="header" href="#三类最典型的浪费">三类最典型的浪费</a></h2>
+<p>把"重复工作"拆开看，至少有三类浪费是当前 Agent 工作流的常态：</p>
+<p><strong>第一类：关于人和约束的上下文反复丢失。</strong> "别重构旧的鉴权模块，移动端还在用它。"——这类代价很高的上下文，本不该靠人每次口头提醒。用户的偏好、项目的约束、历史上的关键决策，这些信息散落在过去的对话里，却没有一个地方让它们持续生效。</p>
+<p><strong>第二类：已经练会的技能无法继承。</strong> 一个 Agent 花了四十轮对话才搞明白的上线检查流程、SQL 优化手法、Review 关注点，在会话结束时就蒸发了。下一个 Agent（甚至是同一个 Agent 的下一次会话）只能重新踩坑。</p>
+<p><strong>第三类：文档和代码的理解成本每次重付。</strong> Agent 接手任务的第一个动作往往是遍历文件目录、通读文档来建立认知。这份学习成本你已经付过了——付给上一个 Agent 的时候。它应该变成存档，而不是每次重新支付。</p>
+<h2 id="记忆的价值在于流动与继承"><a class="header" href="#记忆的价值在于流动与继承">记忆的价值在于流动与继承</a></h2>
+<p>如果记忆只存在单个 Agent 的私有空间里，它的价值是有上限的。真正放大价值的是<strong>团队化</strong>：工作中产生资产，资产在团队中流动，新成员进来直接读档。</p>
+<p>这正是本项目 Memory Hub 的设计核心——面向 Agent 团队的记忆中枢，让经验完成一个完整的循环：</p>
+<ol>
+<li><strong>自动沉淀资产</strong>：从对话和任务中生成 Chat Memory 与 Skill，把文档和代码变成 Wiki 与 CodeGraph，再统一管理、审核和路由。</li>
+<li><strong>可迁移、兼容多 Agent</strong>：记忆资产与 Agent 框架解耦，可以跨框架迁移，也可以由团队内的多个 Agent、多个成员共享和维护。</li>
+<li><strong>冷启动友好</strong>：导入已有文档、代码库和历史对话 Session，新的 Agent 团队从现有经验开始工作，不必从头学起。</li>
+</ol>
+<h2 id="benchmark-的佐证"><a class="header" href="#benchmark-的佐证">Benchmark 的佐证</a></h2>
+<p>这套理念有一个可量化的检验：在 PersonaMem 基准上（它专门检验 Agent 能否在长期交互后正确理解和运用用户信息），不启用本项目时得分 48%，启用后达到 <strong>76%</strong>，相对提升 <strong>+59%</strong>。</p>
+<p>数字本身不是重点；重点是它验证了一个朴素的判断——<strong>当记忆被结构化地沉淀并按需召回时，Agent 对"人"和"事"的理解会发生质变，而不是量变。</strong></p>
+<h2 id="本书的阅读路径"><a class="header" href="#本书的阅读路径">本书的阅读路径</a></h2>
+<p>本书按四个层次组织：</p>
+<ul>
+<li><strong>Part I 介绍</strong>：回答"为什么"和"是什么"，建立核心概念词汇表。</li>
+<li><strong>Part II 全景</strong>：画出完整架构图和数据流，让你在动手之前先看清全貌。</li>
+<li><strong>Part III 入门</strong>：从一键部署到第一次看到记忆在面板里生长，跟着做就能跑通。</li>
+<li><strong>Part IV 进阶</strong>：深入各组件源码内幕——生成管线、召回算法、注入策略、权限实现、SDK 与自定义 Adapter 开发，以及生产级部署形态。</li>
+</ul>
+<p>如果你只想快速用起来，读完 Part III 即可；如果你想改造它、贡献代码，或者在生产环境大规模部署，Part IV 是为你准备的。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+                            <a rel="next prefetch" href="intro/what-is-this.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+                    <a rel="next prefetch" href="intro/what-is-this.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

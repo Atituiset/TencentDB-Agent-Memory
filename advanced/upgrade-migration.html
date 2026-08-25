@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>升级与数据迁移 - TencentDB Agent Memory 深度指南</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="从介绍、全景、入门到进阶：理解、部署与深挖 TencentDB Agent Memory">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TencentDB Agent Memory 深度指南</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory/edit/main/book/src/src/advanced/upgrade-migration.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="升级与数据迁移"><a class="header" href="#升级与数据迁移">升级与数据迁移</a></h1>
+<h2 id="版本演进脉络"><a class="header" href="#版本演进脉络">版本演进脉络</a></h2>
+<p>公开仓库的 CHANGELOG 从 2.0.0-beta.1 起步（更早的 v0.x/v1.x 是内部历史）。关键节点：</p>
+<div class="table-wrapper"><table><thead><tr><th>版本</th><th>时间</th><th>里程碑</th></tr></thead><tbody>
+<tr><td>2.0.0-beta.1</td><td>2026-07-21</td><td>首次公开发布：四类记忆资产、Memory Hub、Proxy 双协议、三镜像、官方 SDK</td></tr>
+<tr><td>2.0.0</td><td>2026-08-03</td><td>Skill 强制归档、CodeGraph 定时同步、Cost Guard、面板中英文、System Admin 开放资产管理</td></tr>
+<tr><td>2.0.1-beta.1</td><td>2026-08-13</td><td>冷启动开箱即用（默认 Agent + 预置 Skill）、Wiki 并发加速、Codex/WorkBuddy/dsh 接入、清空对话记忆</td></tr>
+<tr><td>2.0.1-beta.2</td><td>最新</td><td>发布迭代（文档与图标更新）</td></tr>
+</tbody></table>
+</div>
+<h2 id="数据迁移v2--v3"><a class="header" href="#数据迁移v2--v3">数据迁移：v2 → v3</a></h2>
+<p>v1.x / v0.x 的数据格式是 v2；v2.0.0+ 使用格式 v3。<strong>升级后必须先迁移再启动新版 Gateway</strong>，否则新代码无法读取旧数据。</p>
+<h3 id="迁移步骤"><a class="header" href="#迁移步骤">迁移步骤</a></h3>
+<pre><code class="language-bash"># 0) 备份！备份整个数据目录
+cp -r ~/.memory-tencentdb/memory-tdai ~/.memory-tencentdb/memory-tdai.bak
+
+# 1) dry-run 检查，确认无报错
+python scripts/migrate-v2-to-v3/v2-to-v3-migrate.py \
+  ~/.memory-tencentdb/memory-tdai --dry-run
+
+# 2) 正式执行
+python scripts/migrate-v2-to-v3/v2-to-v3-migrate.py \
+  ~/.memory-tencentdb/memory-tdai
+</code></pre>
+<p>工具位于 <code>MemoryCore/scripts/migrate-v2-to-v3/</code>，目录内有独立的 README 说明全部参数。其他存量迁移脚本还有 <code>migrate-sqlite-to-tcvdb</code>（SQLite → 腾讯云向量库）与 <code>import-opik-to-memory-core</code>（从 Opik 导入历史数据）。</p>
+<h2 id="升级操作建议"><a class="header" href="#升级操作建议">升级操作建议</a></h2>
+<ul>
+<li><strong>Docker 部署</strong>：named volume 里的数据跨版本保留；拉新镜像重启即可。跨大版本（v1→v2）先对 volume 里的数据目录跑迁移脚本；</li>
+<li><strong>源码部署</strong>：pull 后 <code>npm install &amp;&amp; npm run build</code> 再迁移再启动；</li>
+<li><strong>SDK</strong>：注意 npm 包名曾迁出 <code>-v2</code> 后缀的历史；Python 包根导入默认给 v2 兼容客户端，v3 要显式 <code>from tencentdb_agent_memory.v3 import ...</code>；</li>
+<li><strong>Proxy 客户端配置</strong>：小版本内兼容；大版本留意 INSTALL 文档中的已知限制变化（例如 <code>x-task-id</code> 必填是否放开）。</li>
+</ul>
+<h2 id="ci-红线贡献者必读"><a class="header" href="#ci-红线贡献者必读">CI 红线：贡献者必读</a></h2>
+<p>项目的 CI（<code>.github/workflows/pr-ci.yml</code>）目前聚焦 MemoryCore，五个 job：</p>
+<ol>
+<li><strong>Install</strong>：Node 22 + 依赖缓存；</li>
+<li><strong>Pack</strong>：<code>npm pack</code> 并上传 tgz 工件（7 天留存）;</li>
+<li><strong>Manifest</strong>：校验 <code>openclaw.plugin.json</code> 合法性与 package.json 的 OpenClaw 扩展元数据；</li>
+<li><strong>Size Guard</strong>：tarball ≤ 2048 KB，超了直接失败——插件体积是被硬约束的；</li>
+<li><strong>Skill Queue Isolation</strong>（最特殊）：跑 <code>scripts/ci/check-skill-queue-isolation.sh</code>，基于设计文档 <code>docs/design/2026-06-16-skill-extract-queue.md</code> 检查 diff：
+<ul>
+<li>禁止触碰记忆模块红线文件（state/pipeline-worker/integrations/redis）;</li>
+<li>禁止 <code>src/core/skill/**</code> 新增直接 fs import。</li>
+</ul>
+</li>
+</ol>
+<p>这条红线的背景：Skill 抽取队列被刻意设计为与记忆管线隔离的独立队列——保证 Skill 归档的延迟不影响主记忆链路，也保证它不依赖进程本地状态。改动这些区域前先读对应设计文档。</p>
+<h2 id="roadmap-摘要"><a class="header" href="#roadmap-摘要">Roadmap 摘要</a></h2>
+<p>v2.0.1 正式版规划中的重点方向：</p>
+<ul>
+<li><strong>Agent 模版</strong>：管理员定义默认 Agent 的初始资产装配（冷启动的下一步）；</li>
+<li><strong><code>mem:</code> 指令扩展到 Task 维度</strong>：对话内创建/更新 Task；</li>
+<li><strong>记忆可编辑</strong>：L1-L3 支持面板编辑修正——从"系统产出的结果"变为"可人工校准的资产"；</li>
+<li><strong>L0/L1 记忆搜索</strong>：按内容定位而不仅是时间过滤；</li>
+<li><strong>Cursor 支持</strong>：新增客户端适配。</li>
+</ul>
+<p>完整计划见仓库 <code>ROADMAP_CN.md</code>；优先级会根据社区反馈动态调整。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../advanced/observability.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../appendix/env-vars.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../advanced/observability.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../appendix/env-vars.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

@@ -1,3 +1,4 @@
+> 📖 中文深度指南（GitHub Pages）：<https://atituiset.github.io/TencentDB-Agent-Memory/>
 
 <div align="center">
 
